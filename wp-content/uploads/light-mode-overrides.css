@@ -176,6 +176,23 @@ html.light-mode .header .head-top .mode-switch-btn:hover {
     }
 }
 
+/* Closing the mobile menu re-adds .background-enabled, which turns the logo into a white silhouette */
+.background-enabled .header .logo img {
+    filter: none !important;
+}
+
+html.light-mode .background-enabled .header .menu-btn:before,
+html.light-mode .background-enabled .header .menu-btn:after,
+html.light-mode .background-enabled .header .menu-btn span {
+    background: #000;
+}
+
+html.light-mode .background-enabled .header .top-menu > ul > li > a,
+html.light-mode .background-enabled .header .top-menu .top-menu-nav > ul > li > a,
+html.light-mode .background-enabled .header .top-menu .top-menu-nav .menu-topmenu-container > ul > li > a {
+    color: #262728;
+}
+
 /* Open mobile menu stays solid so links are readable */
 .header.active {
     background: #101010 !important;
