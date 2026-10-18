@@ -85,3 +85,11 @@ body.page-id-564 .header.social-scrolled {
 html.light-mode body.page-id-564 .header.social-scrolled {
     background: #ffffff !important;
 }
+
+body.page-id-551 .header.portfolio-scrolled {
+    background: #101010 !important;
+}
+
+html.light-mode body.page-id-551 .header.portfolio-scrolled {
+    background: #ffffff !important;
+}
