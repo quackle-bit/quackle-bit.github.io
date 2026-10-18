@@ -199,15 +199,19 @@
 @media (max-width: 560px) {
     .qb-games, .qb-gallery { padding-left: 16px; padding-right: 16px; }
     .qb-filters {
-        justify-content: flex-start;
-        flex-wrap: nowrap;
-        overflow-x: auto;
+        justify-content: center;
+        flex-wrap: wrap;
+        overflow: visible;
         padding: 2px 2px 8px;
-        margin-right: -16px;
-        scrollbar-width: none;
+        margin-right: 0;
     }
-    .qb-filters::-webkit-scrollbar { display: none; }
-    .qb-filters button { flex: 0 0 auto; }
+    .qb-filters button {
+        flex: 0 1 auto;
+        height: auto !important;
+        min-height: 44px;
+        max-width: 100%;
+        white-space: normal;
+    }
     .qb-gallery-grid { columns: 1; }
     .qb-game-info { min-height: 0; }
 }
