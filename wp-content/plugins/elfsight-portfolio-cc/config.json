@@ -1,0 +1,1321 @@
+{
+	"observerUrl": "./preview/dist/portfolio-observer.js",
+	"preferences": {
+		"previewUpdateTimeout": 0,
+		"previewDefaultBgColor": "white",
+		"enableCustomCSS": true
+	},
+	"settings": {
+		"tabs": [
+			{
+				"id": "content",
+				"name": "Content",
+				"active": true
+			},
+			{
+				"id": "layout",
+				"name": "Layout"
+			},
+			{
+				"id": "project",
+				"name": "Project"
+			},
+			{
+				"id": "style",
+				"name": "Style"
+			}
+		],
+		"properties": [
+			{
+				"id": "projects",
+				"name": "Projects",
+				"description": "Add projects to your portfolio.",
+				"tab": "content",
+				"type": "complex",
+				"complex": {
+					"idProperty": "id",
+					"nameProperty": "name",
+					"previewProperties": "previewPicture,media",
+					"properties": [
+						{
+							"id": "media",
+							"name": "Pictures & Videos",
+							"description": "Add pictures and videos to your project. The first picture you upload will be used as your project's default preview, unless you specifically set the preview picture option. The other images can be viewed in a popup window when you click on the project in the list.",
+							"type": "file",
+							"file": {
+								"old": false,
+								"multiple": true,
+								"accept": "image/*",
+								"tabs": [
+									{
+										"name": "Upload File",
+										"value": "upload"
+									},
+									{
+										"name": "Recently Uploaded",
+										"value": "files"
+									},
+									{
+										"name": "Picture or Video URL",
+										"value": "link"
+									}
+								]
+							},
+							"defaultValue": null,
+							"allowEmpty": true
+						},
+						{
+							"id": "previewPicture",
+							"name": "Preview Picture",
+							"description": "Set a picture for the project's preview. The preview will be displayed in projets list. Tip: We recommend to use a smaller image for preview, to improve loading speed and performance.",
+							"type": "file",
+							"file": {
+								"old": false,
+								"accept": "image/*",
+								"tabs": [
+									{
+										"name": "Upload File",
+										"value": "upload"
+									},
+									{
+										"name": "Recently Uploaded",
+										"value": "files"
+									},
+									{
+										"name": "Picture URL",
+										"value": "link"
+									}
+								]
+							},
+							"defaultValue": null,
+							"allowEmpty": true
+						},
+						{
+							"type": "divider"
+						},
+						{
+							"id": "name",
+							"name": "Name",
+							"description": "Enter the project's name.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "category",
+							"name": "Category",
+							"description": "Choose a category for the project.",
+							"type": "select",
+							"allowEmpty": true,
+							"select": {
+								"optionsSource": "categories",
+								"enableNewSourceAdd": true
+							},
+							"defaultValue": ""
+						},
+						{
+							"id": "description",
+							"name": "Description",
+							"description": "Describe your project.",
+							"type": "textarea",
+							"textarea": {
+								"enableRichEdit": true,
+								"enableRichEditHtml": true
+							},
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "caption",
+							"name": "Project Details",
+							"caption": "Enter short information about the project - Date, Client, etc.",
+							"description": "Enter short information about the project - Date, Client, etc.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "website",
+							"name": "Website",
+							"description": "Set the project's website URl, if available.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "id",
+							"name": "ID",
+							"type": "text",
+							"visible": false
+						}
+					]
+				},
+				"defaultValue": [
+					{
+						"id": "40b321b5-a2d6-4fe5-a5df-423d8ee59e9f",
+						"name": "Praesent ligula diam",
+						"category": "a27e3ed0-22a7-454a-9ad5-fa4d3a3beaf2",
+						"description": "Sed et arcu sagittis, ornare eros vitae, vehicula nunc.",
+						"date": 1520321760000,
+						"website": "",
+						"previewPicture": null,
+						"media": [
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "jeremy-bishop-340107-unsplash.jpg",
+									"size": 1623437,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/0aedfdf4-cc9a-48a8-adef-bcad412dcc46.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/0aedfdf4-cc9a-48a8-adef-bcad412dcc46.jpeg",
+									"width": 4242,
+									"height": 2828
+								},
+								"description": "Proin lobortis dolor sed risus lobortis hendrerit.<br>Duis tincidunt dui in velit molestie aliquet. Duis a dictum metus."
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "oliver-sjostrom-628738-unsplash.jpg",
+									"size": 3142895,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/48dee6c0-fd3b-4394-b6e0-b8084e63c7a6.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/48dee6c0-fd3b-4394-b6e0-b8084e63c7a6.jpeg",
+									"width": 4000,
+									"height": 5000
+								},
+								"description": "Etiam eu odio sed ipsum vehicula pretium. Fusce imperdiet faucibus nisl, pellentesque euismod sapien lacinia vitae."
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "nicole-honeywill-727770-unsplash.jpg",
+									"size": 3954206,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/6c627bf4-9474-4ace-85b2-4c8980fa464c.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/6c627bf4-9474-4ace-85b2-4c8980fa464c.jpeg",
+									"width": 5184,
+									"height": 3456
+								}
+							}
+						]
+					},
+					{
+						"id": "dfef9005-2d0c-40da-9742-4d2422b73939",
+						"name": "Cras nec dui quis felis ullamcorper",
+						"category": "a27e3ed0-22a7-454a-9ad5-fa4d3a3beaf2",
+						"description": "Nunc diam diam, viverra porttitor nisl pharetra, auctor malesuada arcu.\nUt finibus erat lorem. Suspendisse eget felis ipsum. Donec faucibus, \nlibero sit amet consequat pulvinar, ante urna dapibus orci, et viverra \nurna est vitae velit. ",
+						"date": "2017-06-08 10:43",
+						"website": "",
+						"previewPicture": null,
+						"media": [
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "thomas-ashlock-64484-unsplash.jpg",
+									"size": 966589,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/e17c9fc6-015b-459c-991e-789222204208.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/e17c9fc6-015b-459c-991e-789222204208.jpeg",
+									"width": 2049,
+									"height": 2049
+								},
+								"description": "Cras nec dui quis felis ullamcorper elementum at vel nibh."
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "mathieu-chirico-1013472-unsplash.jpg",
+									"size": 3376143,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/4b8cead4-77f9-4cb7-8513-900aaedc4d0c.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/4b8cead4-77f9-4cb7-8513-900aaedc4d0c.jpeg",
+									"width": 3508,
+									"height": 4961
+								},
+								"description": "Sed et arcu sagittis, ornare eros vitae, vehicula nunc.<br>Nulla consequat \negestas justo eu ullamcorper.<br>Suspendisse tempus felis ultricies lectus \nrhoncus, id vestibulum augue mattis."
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "joseph-greve-343334-unsplash.jpg",
+									"size": 4926397,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/0623cdc0-7e96-4da1-9962-d4b9e831cdcd.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/0623cdc0-7e96-4da1-9962-d4b9e831cdcd.jpeg",
+									"width": 5184,
+									"height": 3456
+								},
+								"description": "In porttitor neque quis lacus accumsan lobortis. Nunc a bibendum sapien. Vivamus eget egestas risus, in pellentesque nisl "
+							}
+						]
+					},
+					{
+						"id": "350ec223-d45e-4746-b915-80ab034e7778",
+						"name": "Maecenas vel purus vitae",
+						"category": "4523ac15-ce7f-471b-a3a3-a3c4ac0efbb9",
+						"description": "Nunc a bibendum sapien. Vivamus eget egestas risus, in pellentesque nisl.",
+						"date": 1556610742508,
+						"website": "",
+						"previewPicture": null,
+						"media": [
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "igor-starkov-611293-unsplash.jpg",
+									"size": 1403413,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/4ec744d1-1dd2-4afb-b1a9-2d7c3ee1d6d5.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/4ec744d1-1dd2-4afb-b1a9-2d7c3ee1d6d5.jpeg",
+									"width": 3456,
+									"height": 5184
+								}
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "guy-kawasaki-668859-unsplash.jpg",
+									"size": 3521732,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/2ac5af43-8d20-4851-ae8b-b197f9068b72.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/2ac5af43-8d20-4851-ae8b-b197f9068b72.jpeg",
+									"width": 6000,
+									"height": 4000
+								}
+							}
+						]
+					},
+					{
+						"id": "ee6b40cb-5239-4175-9068-866ff41da224",
+						"name": "Vivamus ultricies",
+						"category": "4523ac15-ce7f-471b-a3a3-a3c4ac0efbb9",
+						"description": "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas<br>",
+						"date": 1468569300000,
+						"website": "",
+						"previewPicture": null,
+						"media": [
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "colton-duke-596699-unsplash.jpg",
+									"size": 534214,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/5d83c2e6-657e-4520-8cdf-3f03b49780d0.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/5d83c2e6-657e-4520-8cdf-3f03b49780d0.jpeg",
+									"width": 2302,
+									"height": 3070
+								},
+								"description": "Donec faucibus, nunc eget molestie pulvinar, risus dolor imperdiet libero, in feugiat lacus mi sed enim."
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "parker-amstutz-701794-unsplash.jpg",
+									"size": 1908281,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/753f4484-8b47-49b6-971a-45c88dd1da97.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/753f4484-8b47-49b6-971a-45c88dd1da97.jpeg",
+									"width": 2624,
+									"height": 3936
+								},
+								"description": "Nulla condimentum, dolor et molestie dapibus, enim orci lacinia quam, \nquis tincidunt arcu arcu ac mauris.<br>Aliquam vel tincidunt dui. Integer \nut imperdiet elit. Proin justo orci, porttitor vitae ex vel, laoreet \npharetra leo."
+							}
+						]
+					},
+					{
+						"id": "82861d1e-c1a8-4fb1-bce7-39b5ec507317",
+						"name": "In cursus magna velit",
+						"category": "4523ac15-ce7f-471b-a3a3-a3c4ac0efbb9",
+						"description": "In cursus magna velit sit amet ante. Aliquam imperdiet nulla sit amet arcu pellentesque varius.",
+						"date": "2011-07-14 11:03",
+						"website": "",
+						"previewPicture": null,
+						"media": [
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "chris-osmond-385532-unsplash.jpg",
+									"size": 8414223,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/2279b7c5-33a7-4734-9d93-d442d470640e.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/2279b7c5-33a7-4734-9d93-d442d470640e.jpeg",
+									"width": 6720,
+									"height": 4480
+								}
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "tyler-nix-691376-unsplash.jpg",
+									"size": 1306659,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/62326f2e-4cab-4c52-b70e-22e62823aa2e.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/62326f2e-4cab-4c52-b70e-22e62823aa2e.jpeg",
+									"width": 3088,
+									"height": 4632
+								}
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "blake-hunter-223009-unsplash.jpg",
+									"size": 3034885,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/b97ac9e1-8109-4e4b-bc4a-b993d51e63c5.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/b97ac9e1-8109-4e4b-bc4a-b993d51e63c5.jpeg",
+									"width": 5472,
+									"height": 3648
+								}
+							}
+						]
+					},
+					{
+						"id": "3e00bb70-942a-483f-bc22-77a1b6a5ee6f",
+						"name": "Vestibulum vulputate malesuada",
+						"category": "a27e3ed0-22a7-454a-9ad5-fa4d3a3beaf2",
+						"description": "Vivamus ultricies orci a tellus pretium, id euismod lorem ornare. \nPellentesque habitant morbi tristique senectus et netus et malesuada \nfames ac turpis egestas.<br>",
+						"date": 1435910760000,
+						"website": "",
+						"previewPicture": null,
+						"media": [
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "ryan-magsino-368301-unsplash.jpg",
+									"size": 1452287,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/71f7c6ae-e36e-4730-80f0-83f9ba901153.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/71f7c6ae-e36e-4730-80f0-83f9ba901153.jpeg",
+									"width": 5568,
+									"height": 3712
+								},
+								"description": "Suspendisse semper aliquam sapien. Donec bibendum hendrerit accumsan."
+							},
+							{
+								"type": "uploaded",
+								"data": {
+									"name": "jared-tomasek-752028-unsplash.jpg",
+									"size": 4531219,
+									"type": "image/jpeg",
+									"url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/407caa9d-b5c6-4661-b629-f712f739b072.jpeg",
+									"extension": "jpeg",
+									"file_url": "https://files.elfsight.com/storage/4bc9e068-6999-4781-ad0c-ab83bceba5ea/407caa9d-b5c6-4661-b629-f712f739b072.jpeg",
+									"width": 5472,
+									"height": 3648
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"id": "categoriesSubgroup",
+				"name": "Categories",
+				"tab": "content",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "categoriesEnabled",
+							"name": "Enable Categories",
+							"description": "Activate this option to group your projects by categories.",
+							"type": "toggle",
+							"defaultValue": true
+						},
+						{
+							"id": "categories",
+							"name": "Categories",
+							"description": "Create your categories.",
+							"global": true,
+							"tab": "content",
+							"type": "complex",
+							"complex": {
+								"nameProperty": "name",
+								"idProperty": "value",
+								"properties": [
+									{
+										"id": "name",
+										"name": "Name",
+										"description": "Set the category name.",
+										"type": "text",
+										"defaultValue": ""
+									},
+									{
+										"type": "static-html",
+										"name": "",
+										"staticHtml": {
+											"content": "<div style=\"font-size:13px;\">Note: Add at least one project in order for the category to display.</div>"
+										}
+									},
+									{
+										"id": "value",
+										"name": "Value",
+										"type": "text",
+										"visible": false
+									}
+								]
+							},
+							"defaultValue": [
+								{
+									"value": "a27e3ed0-22a7-454a-9ad5-fa4d3a3beaf2",
+									"name": "On the Wave",
+									"undefined": null
+								},
+								{
+									"value": "4523ac15-ce7f-471b-a3a3-a3c4ac0efbb9",
+									"name": "People",
+									"undefined": null
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"tab": "content",
+				"type": "divider"
+			},
+			{
+				"id": "widgetTitleSubgroup",
+				"name": "Widget Title",
+				"tab": "content",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "widgetTitle",
+							"name": "Widget Title",
+							"description": "Set the widget's title to be displayed above the portfolio.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						}
+					]
+				}
+			},
+			{
+				"id": "authorSubgroup",
+				"name": "Author",
+				"tab": "content",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"type": "static-html",
+							"name": "",
+							"staticHtml": {
+								"content": "<div style=\"font-size:13px;\">Fill in the fields below if you want to feature the author in the portfolio.</div>"
+							}
+						},
+						{
+							"id": "authorWhereToDisplay",
+							"name": "Where to display author",
+							"description": "Select places in your portfolio where you want to feature the author.",
+							"type": "checklist",
+							"checklist": {
+								"options": [
+									{
+										"value": "projects",
+										"name": "Above Projects"
+									},
+									{
+										"value": "popup",
+										"name": "In popup"
+									}
+								]
+							},
+							"defaultValue": []
+						},
+						{
+							"id": "authorName",
+							"name": "Name",
+							"description": "Enter the author's name.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "authorDescription",
+							"name": "Bio",
+							"description": "Add the author's short bio.",
+							"type": "textarea",
+							"textarea": {
+								"enableRichEdit": true,
+								"enableRichEditHtml": true
+							},
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "authorPhoto",
+							"name": "Photo",
+							"description": "Upload the author's photo.",
+							"type": "file",
+							"file": {
+								"old": false,
+								"accept": "image/*",
+								"tabs": [
+									{
+										"name": "Upload File",
+										"value": "upload"
+									},
+									{
+										"name": "Recently Uploaded",
+										"value": "files"
+									},
+									{
+										"name": "File by URL",
+										"value": "link"
+									}
+								]
+							},
+							"defaultValue": null,
+							"allowEmpty": true
+						},
+						{
+							"id": "authorEmail",
+							"name": "Email",
+							"description": "Enter the author's email to let people contact them directly.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "authorPhone",
+							"name": "Phone",
+							"description": "Enter the author's phone to let people contact them directly.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						},
+						{
+							"id": "authorSocial",
+							"name": "Social Profiles",
+							"description": "Add links to the author's social media accounts.",
+							"type": "complex",
+							"complex": {
+								"properties": [
+									{
+										"id": "type",
+										"name": "Type",
+										"description": "Selet social media.",
+										"type": "select",
+										"select": {
+											"options": [
+												{
+													"value": "facebook",
+													"name": "Facebook"
+												},
+												{
+													"value": "twitter",
+													"name": "Twitter"
+												},
+												{
+													"value": "dribbble",
+													"name": "Dribbble"
+												},
+												{
+													"value": "behance",
+													"name": "Behance"
+												},
+												{
+													"value": "linkedin",
+													"name": "LinkedIn"
+												},
+												{
+													"value": "instagram",
+													"name": "Instagram"
+												},
+												{
+													"value": "pinterest",
+													"name": "Pinterest"
+												},
+												{
+													"value": "vk",
+													"name": "VK"
+												}
+											]
+										}
+									},
+									{
+										"id": "link",
+										"name": "Profile (username, link)",
+										"description": "Set the link to the author's media profile.",
+										"type": "text",
+										"defaultValue": ""
+									}
+								]
+							},
+							"defaultValue": []
+						}
+					]
+				}
+			},
+			{
+				"id": "ctaSubgroup",
+				"name": "Call to Action (Hire me)",
+				"tab": "content",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "ctaWhereToDisplay",
+							"name": "Where to Display Call to Action",
+							"description": "Select places in your portfolio where you want to encourage your target visitors to perform an action, for example, to contact you or to order a project.",
+							"type": "checklist",
+							"checklist": {
+								"options": [
+									{
+										"value": "projects",
+										"name": "Above Projects"
+									},
+									{
+										"value": "popup",
+										"name": "In popup"
+									}
+								]
+							},
+							"defaultValue": []
+						},
+						{
+							"id": "ctaButtonText",
+							"name": "Button Text",
+							"description": "Set the call to action button text.",
+							"type": "text",
+							"defaultValue": "Hire me",
+							"allowEmpty": true
+						},
+						{
+							"id": "ctaButtonLink",
+							"name": "Button Link",
+							"description": "Set the call to action button link.",
+							"type": "text",
+							"defaultValue": "",
+							"allowEmpty": true
+						}
+					]
+				}
+			},
+			{
+				"id": "languageSubgroup",
+				"name": "Language",
+				"tab": "content",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "lang",
+							"name": "Language",
+							"description": "Choose your portfolio's language.",
+							"tab": "content",
+							"type": "select",
+							"select": {
+								"options": [
+									{
+										"value": "de",
+										"name": "Deutsch"
+									},
+									{
+										"value": "en",
+										"name": "English"
+									},
+									{
+										"value": "es",
+										"name": "Español"
+									},
+									{
+										"value": "fr",
+										"name": "Français"
+									},
+									{
+										"value": "ru",
+										"name": "Русский"
+									},
+									{
+										"value": "pt",
+										"name": "Português"
+									},
+									{
+										"value": "sv",
+										"name": "Svenska"
+									},
+									{
+										"value": "pl",
+										"name": "Polski"
+									},
+									{
+										"value": "no",
+										"name": "Norsk"
+									},
+									{
+										"value": "it",
+										"name": "Italiano"
+									},
+									{
+										"value": "hu",
+										"name": "Magyar"
+									},
+									{
+										"value": "fi",
+										"name": "Finnish"
+									},
+									{
+										"value": "dk",
+										"name": "Dansk"
+									},
+									{
+										"value": "tr",
+										"name": "Turkish"
+									},
+									{
+										"value": "ar",
+										"name": "Arabic"
+									},
+									{
+										"value": "lt",
+										"name": "Lithuanian"
+									},
+									{
+										"value": "cz",
+										"name": "Czech"
+									},
+									{
+										"value": "nl",
+										"name": "Dutch"
+									},
+									{
+										"value": "ro",
+										"name": "Romanian"
+									}
+								]
+							},
+							"defaultValue": "en"
+						}
+					]
+				}
+			},
+			{
+				"id": "layout",
+				"name": "Layout",
+				"description": "Select the portfolio layout.",
+				"tab": "layout",
+				"type": "select-visual",
+				"select": {
+					"options": [
+						{
+							"value": "grid",
+							"name": "Grid",
+							"img": "data:image/png;base64,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"
+						},
+						{
+							"value": "masonry",
+							"name": "Masonry",
+							"img": "data:image/png;base64,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"
+						},
+						{
+							"value": "list",
+							"name": "List",
+							"img": "data:image/png;base64,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"
+						}
+					]
+				},
+				"defaultValue": "grid"
+			},
+			{
+				"id": "gridSubgroup",
+				"name": "Grid Settings",
+				"tab": "layout",
+				"type": "subgroup",
+				"visible": false,
+				"subgroup": {
+					"properties": [
+						{
+							"id": "gridColumns",
+							"name": "Columns",
+							"description": "Set the number of columns.",
+							"type": "number",
+							"defaultValue": 3
+						},
+						{
+							"id": "gridRows",
+							"name": "Rows",
+							"description": "Set the number of rows.",
+							"type": "number",
+							"defaultValue": 3
+						},
+						{
+							"id": "gridGutter",
+							"name": "Gutter",
+							"description": "Set the spaces between the projects in pixels.",
+							"type": "number",
+							"defaultValue": 10
+						},
+						{
+							"id": "gridItemAspectRatio",
+							"name": "Preferred Image Shape",
+							"description": "",
+							"type": "select",
+							"select": {
+								"options": [
+									{
+										"value": 0.669,
+										"name": "Landscape (3:2)"
+									},
+									{
+										"value": 1,
+										"name": "Square (1:1)"
+									},
+									{
+										"value": 1.5,
+										"name": "Portrait (2:3)"
+									}
+								]
+							},
+							"defaultValue": 0.669
+						},
+						{
+							"id": "gridMobileSubgroup",
+							"name": "Mobile Behavior",
+							"type": "subgroup",
+							"subgroup": {
+								"properties": [
+									{
+										"id": "gridColumnsTablet",
+										"name": "Number of Columns on Tablets",
+										"description": "Set the number of columns for tablets.",
+										"type": "number",
+										"defaultValue": 2
+									},
+									{
+										"id": "gridRowsTablet",
+										"name": "Number of Rows on Tablets",
+										"description": "Set the number of rows for tablets.",
+										"type": "number",
+										"defaultValue": 2
+									},
+									{
+										"type": "divider"
+									},
+									{
+										"id": "gridColumnsMobile",
+										"name": "Number of Columns on Mobiles",
+										"description": "Set the number of columns for mobiles.",
+										"type": "number",
+										"defaultValue": 1
+									},
+									{
+										"id": "gridRowsMobile",
+										"name": "Number of Rows on Mobiles",
+										"description": "Set the number of rows for mobiles.",
+										"type": "number",
+										"defaultValue": 1
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"id": "masonrySubgroup",
+				"name": "Masonry Settings",
+				"tab": "layout",
+				"type": "subgroup",
+				"visible": false,
+				"subgroup": {
+					"properties": [
+						{
+							"id": "masonryColumns",
+							"name": "Columns",
+							"description": "Set the number of columns.",
+							"type": "number",
+							"defaultValue": 3
+						},
+						{
+							"id": "masonryGutter",
+							"name": "Gutter",
+							"description": "Set the spaces between the projects in pixels.",
+							"type": "number",
+							"defaultValue": 10
+						},
+						{
+							"id": "masonryItemsPerPage",
+							"name": "Projects per page",
+							"description": "Set the number of projects to be displayed before the load more button.",
+							"tab": "layout",
+							"type": "number",
+							"defaultValue": 8
+						},
+						{
+							"id": "masonryMobileSubgroup",
+							"name": "Mobile Behavior",
+							"type": "subgroup",
+							"subgroup": {
+								"properties": [
+									{
+										"id": "masonryColumnsTablet",
+										"name": "Number of Columns on Tablets",
+										"description": "Set the number of columns for tablets.",
+										"type": "number",
+										"defaultValue": 2
+									},
+									{
+										"id": "masonryColumnsMobile",
+										"name": "Number of Columns on Mobiles",
+										"description": "Set the number of columns for mobiles.",
+										"type": "number",
+										"defaultValue": 1
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"id": "listSubgroup",
+				"name": "List Settings",
+				"tab": "layout",
+				"type": "subgroup",
+				"visible": false,
+				"subgroup": {
+					"properties": [
+						{
+							"id": "listGutter",
+							"name": "Gutter",
+							"description": "Set the spaces between the projects in pixels.",
+							"type": "number",
+							"defaultValue": 10
+						},
+						{
+							"id": "listItemsPerPage",
+							"name": "Projects per page",
+							"description": "Set the number of projects to be displayed before the load more button.",
+							"tab": "layout",
+							"type": "number",
+							"defaultValue": 8
+						},
+						{
+							"id": "listItemAspectRatio",
+							"name": "Preferred Image Shape",
+							"description": "",
+							"type": "select",
+							"select": {
+								"options": [
+									{
+										"value": 0.333,
+										"name": "Landscape (3:1)"
+									},
+									{
+										"value": 1,
+										"name": "Square (1:1)"
+									},
+									{
+										"value": 0,
+										"name": "Original Shape"
+									}
+								]
+							},
+							"defaultValue": 0.333
+						}
+					]
+				}
+			},
+			{
+				"id": "widthSubgroup",
+				"name": "Width",
+				"tab": "layout",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "width",
+							"name": "Width (px, %, auto)",
+							"description": "Set the widget width in pixels. Or set \"auto\" to make it full width.",
+							"type": "text",
+							"defaultValue": "auto"
+						}
+					]
+				}
+			},
+			{
+				"id": "projectLook",
+				"name": "Project View",
+				"descritpion": "Select the right view for your project.",
+				"tab": "project",
+				"type": "select-visual",
+				"select": {
+					"options": [
+						{
+							"value": "overlay",
+							"name": "Overlay",
+							"img": "https://files.elfsight.com/storage_assets/portfolio/editor/overlay2x.png"
+						},
+						{
+							"value": "card",
+							"name": "Card",
+							"img": "https://files.elfsight.com/storage_assets/portfolio/editor/card2x.png"
+						},
+						{
+							"value": "bottomOverlay",
+							"name": "Bottom Overlay",
+							"img": "https://files.elfsight.com/storage_assets/portfolio/editor/bottom-overlay2x.png"
+						}
+					]
+				},
+				"defaultValue": "overlay"
+			},
+			{
+				"id": "projectInfoSubgroup",
+				"name": "Project Info to Display",
+				"tab": "project",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "projectInfoToDisplay",
+							"name": "Project info to display",
+							"description": "Choose the project info you need to display in the list.",
+							"type": "checklist",
+							"checklist": {
+								"options": [
+									{
+										"value": "name",
+										"name": "Name"
+									},
+									{
+										"value": "description",
+										"name": "Description"
+									},
+									{
+										"value": "caption",
+										"name": "Details"
+									},
+									{
+										"value": "category",
+										"name": "Category"
+									}
+								]
+							},
+							"defaultValue": [
+								"name",
+								"caption",
+								"category"
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "clickActionSubgroup",
+				"name": "Action on Project Click",
+				"tab": "project",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "projectClickAction",
+							"name": "Action on Project Click",
+							"description": "Choose an action that will happen when you click on a project in the list.",
+							"type": "radio",
+							"radio": {
+								"options": [
+									{
+										"value": "popup",
+										"name": "Open Detailed info in Popup"
+									},
+									{
+										"value": "website",
+										"name": "Open Project Website"
+									},
+									{
+										"value": "none",
+										"name": "None"
+									}
+								]
+							},
+							"defaultValue": "popup"
+						},
+						{
+							"id": "popupInfoToDisplay",
+							"name": "Info to display in Popup",
+							"description": "Choose the project info to display in the popup.",
+							"type": "checklist",
+							"checklist": {
+								"options": [
+									{
+										"value": "name",
+										"name": "Name"
+									},
+									{
+										"value": "description",
+										"name": "Description"
+									},
+									{
+										"value": "caption",
+										"name": "Details"
+									},
+									{
+										"value": "category",
+										"name": "Category"
+									},
+									{
+										"value": "website",
+										"name": "Website"
+									}
+								]
+							},
+							"defaultValue": [
+								"name",
+								"description",
+								"caption",
+								"category",
+								"website"
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "portfolioStyleSubgroup",
+				"name": "Portfolio",
+				"tab": "style",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "backgroundColor",
+							"name": "Background Color",
+							"description": "Set the portfolio background color.",
+							"type": "color",
+							"defaultValue": ""
+						},
+						{
+							"id": "textColor",
+							"name": "Text Color",
+							"description": "Set the portfolio text color.",
+							"type": "color",
+							"defaultValue": "rgb(17, 17, 17)"
+						},
+						{
+							"id": "ctaColor",
+							"name": "Call to Action Button Color",
+							"description": "Set call to action button color.",
+							"type": "color",
+							"defaultValue": "rgb(28, 59, 255)"
+						},
+						{
+							"id": "linksColor",
+							"name": "Links Color",
+							"description": "Set the links color.",
+							"type": "color",
+							"defaultValue": "rgb(28, 59, 255)"
+						},
+						{
+							"id": "projectOverlayColor",
+							"name": "Project Overlay Color",
+							"description": "Set project overlay color.",
+							"type": "color",
+							"defaultValue": "rgba(17, 17, 17, 0.7)"
+						},
+						{
+							"id": "projectBackgroundColor",
+							"name": "Project Background Color",
+							"description": "Set project background color.",
+							"type": "color",
+							"defaultValue": ""
+						},
+						{
+							"id": "projectTextColor",
+							"name": "Project Text Color",
+							"description": "Set project text color.",
+							"type": "color",
+							"defaultValue": ""
+						}
+					]
+				}
+			},
+			{
+				"id": "popupStyleSubgroup",
+				"name": "Popup",
+				"tab": "style",
+				"type": "subgroup",
+				"subgroup": {
+					"properties": [
+						{
+							"id": "popupBackgroundColor",
+							"name": "Background Color",
+							"description": "Set popup background color.",
+							"type": "color",
+							"defaultValue": "rgb(255, 255, 255)"
+						},
+						{
+							"id": "popupTextColor",
+							"name": "Text Color",
+							"description": "Set popup text color.",
+							"type": "color",
+							"defaultValue": "rgb(17, 17, 17)"
+						},
+						{
+							"id": "popupOverlayColor",
+							"name": "Overlay Color",
+							"description": "Set popup overlay color.",
+							"type": "color",
+							"defaultValue": "rgba(17, 17, 17, 0.9)"
+						},
+						{
+							"id": "popupCtaColor",
+							"name": "Call to Action Color",
+							"description": "Set popup call to action button color.",
+							"type": "color",
+							"defaultValue": "rgb(28, 59, 255)"
+						},
+						{
+							"id": "popupLinksColor",
+							"name": "Links Color",
+							"description": "Set the links color in popup.",
+							"type": "color",
+							"defaultValue": "rgb(28, 59, 255)"
+						},
+						{
+							"id": "popupTextAlignment",
+							"name": "Text Alignment",
+							"type": "select-inline",
+							"selectInline": {
+								"options": [
+									{
+										"value": "left",
+										"name": "Left"
+									},
+									{
+										"value": "center",
+										"name": "Center"
+									},
+									{
+										"value": "right",
+										"name": "Right"
+									}
+								]
+							},
+							"defaultValue": "left"
+						}
+					]
+				}
+			}
+		]
+	}
+}

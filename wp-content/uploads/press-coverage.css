@@ -1,0 +1,90 @@
+.single-post-text ul.press-coverage-list {
+    display: grid;
+    gap: 16px;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    text-align: left !important;
+}
+
+.single-post-text ul.press-coverage-list > li.press-coverage-card {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 20px;
+    align-items: center;
+    margin: 0 !important;
+    padding: 22px 24px !important;
+    border: 1px solid rgba(255, 255, 255, 0.11) !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.045) !important;
+    transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+}
+
+.single-post-text ul.press-coverage-list > li.press-coverage-card::before {
+    display: none !important;
+    content: none !important;
+}
+
+html.light-mode .press-coverage-card {
+    background: #f5f6f6 !important;
+    border-color: rgba(38, 39, 40, 0.14) !important;
+}
+
+html.light-mode .press-coverage-card-body strong {
+    color: #262728 !important;
+}
+
+html.light-mode .press-coverage-source {
+    color: #585858 !important;
+}
+
+.single-post-text ul.press-coverage-list > li.press-coverage-card:hover {
+    border-color: rgba(70, 156, 160, 0.7);
+    background: rgba(255, 255, 255, 0.075);
+    transform: translateY(-2px);
+}
+
+.press-coverage-year {
+    color: #469ca0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+.press-coverage-card-body {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.press-coverage-card-body strong {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.press-coverage-source {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+}
+
+.press-coverage-card-body a {
+    width: fit-content;
+    margin-top: 4px;
+    color: #469ca0;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.press-coverage-card-body a:hover {
+    color: #fff;
+}
+
+@media (max-width: 560px) {
+    .single-post-text ul.press-coverage-list > li.press-coverage-card {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 18px !important;
+    }
+}

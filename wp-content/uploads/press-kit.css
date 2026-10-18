@@ -1,0 +1,128 @@
+.press-kit-facts,
+.press-kit-socials,
+.press-kit-projects,
+.press-kit-team,
+.press-kit-assets {
+    display: grid;
+    gap: 12px;
+}
+
+.press-kit-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Keep the fact sheet and social sections aligned with the full-width project section. */
+.elementor-element-7372a89 .e-con-inner {
+    grid-template-columns: 1fr !important;
+}
+
+.press-kit-facts > div,
+.press-kit-socials > a,
+.press-kit-projects > a,
+.press-kit-projects > div,
+.press-kit-team > div,
+.press-kit-assets > div {
+    display: grid;
+    gap: 6px;
+    padding: 18px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.press-kit-facts span,
+.press-kit-socials span,
+.press-kit-projects span,
+.press-kit-team span,
+.press-kit-assets span {
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.press-kit-facts strong,
+.press-kit-projects strong,
+.press-kit-team strong {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.press-kit-facts a,
+.press-kit-socials strong,
+.press-kit-projects b,
+.press-kit-team a,
+.press-kit-assets a {
+    color: #469ca0;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.press-kit-socials,
+.press-kit-projects,
+.press-kit-team {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.press-kit-socials a,
+.press-kit-projects a,
+.press-kit-team > div {
+    transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+}
+
+.press-kit-socials a:hover,
+.press-kit-projects a:hover,
+.press-kit-team > div:hover {
+    border-color: rgba(70, 156, 160, 0.7);
+    background: rgba(255, 255, 255, 0.075);
+    transform: translateY(-2px);
+}
+
+.press-kit-assets {
+    grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+    align-items: center;
+}
+
+.press-kit-assets .press-kit-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.press-kit-assets .press-kit-logo img {
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+}
+
+.press-kit-assets p {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .press-kit-facts,
+    .press-kit-socials,
+    .press-kit-projects,
+    .press-kit-team,
+    .press-kit-assets {
+        grid-template-columns: 1fr;
+    }
+
+    .press-kit-coverage-section .content {
+        width: 100%;
+    }
+
+    .press-kit-coverage-section .press-coverage-list {
+        margin: 0;
+    }
+}

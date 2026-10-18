@@ -1,0 +1,22 @@
+.meeek-social-media-links-container{
+	display: inline-flex;
+}
+.meeek-social-media-links-inner-container:hover {
+	transition: cubic-bezier(.07, 1.41, .82, 1.41) 0.2s;
+  transform: scale(1.1);
+}
+.meeek-social-media-links-inner-container{
+	padding:0px 15px;
+}
+.meeek-social-media-links-inner-container a{
+	color:#323232;
+}
+.meeek-social-media-links-inner-container i{
+	font-size:25px;
+}
+
+@media only screen and (max-width: 600px) {
+  .meeek-social-media-links-inner-container{
+	padding:0px 10px;
+}
+}

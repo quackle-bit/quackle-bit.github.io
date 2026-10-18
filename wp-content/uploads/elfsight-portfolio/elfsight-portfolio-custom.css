@@ -1,0 +1,103 @@
+
+.static-portfolio-gallery {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    padding: 8px 0 48px;
+}
+
+.static-portfolio-card {
+    grid-column: span 4;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+}
+
+.static-portfolio-card:hover {
+    background: rgba(255, 255, 255, 0.075);
+    border-color: rgba(70, 156, 160, 0.7);
+    transform: translateY(-4px);
+}
+
+.static-portfolio-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.static-portfolio-link img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.static-portfolio-link:hover img {
+    transform: scale(1.025);
+    opacity: 0.9;
+}
+
+.static-portfolio-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 112px;
+    padding: 18px 20px 20px;
+}
+
+.static-portfolio-card-content strong {
+    color: #fff !important;
+    font-size: 17px !important;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.static-portfolio-card-content span {
+    color: rgba(255, 255, 255, 0.58) !important;
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+}
+
+@media (max-width: 900px) {
+    .static-portfolio-gallery {
+        gap: 18px;
+    }
+
+    .static-portfolio-card {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 640px) {
+    .static-portfolio-gallery {
+        gap: 16px;
+        padding-bottom: 32px;
+    }
+}
+
+@media (max-width: 560px) {
+    .static-portfolio-card {
+        grid-column: 1 / -1;
+    }
+}
+
+html.light-mode .static-portfolio-card {
+    background: #f5f6f6 !important;
+    border-color: rgba(38, 39, 40, 0.14) !important;
+}
+
+html.light-mode .static-portfolio-card-content strong {
+    color: #262728 !important;
+}
+
+html.light-mode .static-portfolio-card-content span {
+    color: #585858 !important;
+}
