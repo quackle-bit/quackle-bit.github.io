@@ -1,0 +1,87 @@
+html.light-mode .static-portfolio-card,
+html.light-mode .press-coverage-card,
+html.light-mode .press-kit-facts > div,
+html.light-mode .press-kit-socials > a,
+html.light-mode .press-kit-projects > a,
+html.light-mode .press-kit-projects > div,
+html.light-mode .press-kit-team > div,
+html.light-mode .press-kit-assets > div,
+html.light-mode .press-kit-assets .press-kit-logo {
+    background: #f5f6f6 !important;
+    border-color: rgba(38, 39, 40, 0.14) !important;
+}
+
+html.light-mode .static-portfolio-card,
+html.light-mode .press-coverage-card {
+    background-color: #f5f6f6 !important;
+    border: 1px solid rgba(38, 39, 40, 0.14) !important;
+    box-shadow: 0 0 0 1px rgba(38, 39, 40, 0.14) !important;
+}
+
+html.light-mode .static-portfolio-card:hover,
+html.light-mode .press-coverage-card:hover,
+html.light-mode .press-kit-socials > a:hover,
+html.light-mode .press-kit-projects > a:hover,
+html.light-mode .press-kit-team > div:hover {
+    background: #edf0f0 !important;
+    border-color: #469ca0 !important;
+}
+
+html.light-mode .static-portfolio-card-content strong,
+html.light-mode .press-kit-facts strong,
+html.light-mode .press-kit-projects strong,
+html.light-mode .press-kit-team strong,
+html.light-mode .press-coverage-card-body strong {
+    color: #262728 !important;
+}
+
+html.light-mode .static-portfolio-card-content span,
+html.light-mode .press-kit-facts span,
+html.light-mode .press-kit-socials span,
+html.light-mode .press-kit-projects span,
+html.light-mode .press-kit-team span,
+html.light-mode .press-kit-assets p,
+html.light-mode .press-coverage-source {
+    color: #585858 !important;
+}
+
+html.light-mode .press-coverage-year {
+    color: #469ca0 !important;
+}
+
+html.light-mode .press-kit-facts a,
+html.light-mode .press-kit-socials strong,
+html.light-mode .press-kit-projects b,
+html.light-mode .press-kit-team a,
+html.light-mode .press-kit-assets a,
+html.light-mode .press-coverage-card-body a {
+    color: #287b80 !important;
+}
+
+html.light-mode .press-kit-assets .press-kit-logo img {
+    background: #fff;
+}
+
+html.light-mode .lines .line-col:before {
+    background: rgba(38, 39, 40, 0.12) !important;
+}
+
+html.light-mode .lines .line-col:first-child:before {
+    background: transparent !important;
+}
+
+html.light-mode .lines .line-col:after {
+    background: #f5f6f6 !important;
+}
+
+html.light-mode .section .content-box {
+    border-color: rgba(38, 39, 40, 0.1) !important;
+}
+
+body.page-id-564 .header.social-scrolled {
+    background: #101010 !important;
+}
+
+html.light-mode body.page-id-564 .header.social-scrolled {
+    background: #ffffff !important;
+}

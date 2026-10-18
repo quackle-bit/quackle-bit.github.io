@@ -1,0 +1,20 @@
+.meeek-about-me-img-holder img{
+    max-width:25%!important;
+    border-radius: 100%!important;
+}
+.meeek-about-me-title{
+    font-size:25px;
+    margin:0px;
+    padding:10px 0px;
+}
+.meeek-about-me-description{
+    margin: 0px;
+    font-size:20px;
+    font-weight: 450;
+}
+
+@media only screen and (max-width: 1025px) {
+  .meeek-about-me-description{
+    padding:0px!important;
+  }
+}
