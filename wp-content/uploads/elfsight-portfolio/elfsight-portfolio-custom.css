@@ -45,7 +45,8 @@
     display: block;
     width: 100%;
     aspect-ratio: 16 / 8;
-    object-fit: cover;
+    object-fit: contain;
+    background: #101016;
     transition: transform .45s ease, filter .45s ease;
 }
 .qb-game:hover img { transform: scale(1.035); filter: saturate(1.08); }
