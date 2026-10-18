@@ -78,18 +78,123 @@ html.light-mode .section .content-box {
     border-color: rgba(38, 39, 40, 0.1) !important;
 }
 
-body.page-id-564 .header.social-scrolled {
-    background: #101010 !important;
+/* Scrolled menu background: translucent, same on every page */
+.header.fixed,
+.header.is-scrolled {
+    background: rgba(16, 16, 16, 0.72) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    backdrop-filter: blur(12px) saturate(1.2);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-html.light-mode body.page-id-564 .header.social-scrolled {
+html.light-mode .header.fixed,
+html.light-mode .header.is-scrolled {
+    background: rgba(255, 255, 255, 0.72) !important;
+    box-shadow: 0 1px 0 rgba(38, 39, 40, 0.08);
+}
+
+/* Compact scrolled bar; logo, mode switch and menu button share one center line */
+.header.fixed,
+.header.is-scrolled {
+    top: 0 !important;
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/* Mode switch: round button at the top right, after the menu */
+.header .head-top {
+    position: relative;
+}
+
+.header .logo {
+    line-height: 0;
+}
+
+.header .logo a {
+    display: block;
+}
+
+.header .head-top .mode-switch-btn {
+    position: absolute;
+    left: auto;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.header .head-top .mode-switch-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(70, 156, 160, 0.7);
+}
+
+.header .mode-switch-btn .mode-swich-label svg {
+    max-height: 17px;
+}
+
+.header .mode-switch-btn .mode-swich-label:hover svg path,
+.header .mode-switch-btn .tgl:checked + .mode-swich-label:hover svg path {
+    fill: #469ca0;
+}
+
+html.light-mode .header .head-top .mode-switch-btn {
+    border-color: rgba(38, 39, 40, 0.16);
+}
+
+html.light-mode .header .head-top .mode-switch-btn:hover {
+    background: rgba(38, 39, 40, 0.06);
+}
+
+/* Wide screens: inline menu, switch right after "Connect" */
+@media (min-width: 1200px) {
+    .header .head-top .mode-switch-btn {
+        top: 50% !important;
+        right: 0;
+        transform: translateY(-50%);
+    }
+
+    .header .top-menu {
+        padding-right: 60px;
+    }
+}
+
+/* Hamburger screens: switch just left of the menu button */
+@media (max-width: 1199px) {
+    .header .logo {
+        vertical-align: top;
+    }
+
+    .header .head-top .mode-switch-btn {
+        top: 10px !important;
+        right: 46px;
+    }
+
+    .header .menu-btn {
+        margin-top: 10px;
+    }
+}
+
+/* Open mobile menu stays solid so links are readable */
+.header.active {
+    background: #101010 !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+html.light-mode .header.active {
     background: #ffffff !important;
 }
 
-body.page-id-551 .header.portfolio-scrolled {
-    background: #101010 !important;
-}
+@media (max-width: 720px) {
+    .header.fixed,
+    .header.is-scrolled {
+        background: rgba(16, 16, 16, 0.8) !important;
+    }
 
-html.light-mode body.page-id-551 .header.portfolio-scrolled {
-    background: #ffffff !important;
+    html.light-mode .header.fixed,
+    html.light-mode .header.is-scrolled {
+        background: rgba(255, 255, 255, 0.8) !important;
+    }
 }
