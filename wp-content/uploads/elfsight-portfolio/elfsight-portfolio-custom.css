@@ -89,14 +89,19 @@
 .qb-filters button:focus-visible { border-color: rgba(86, 190, 188, .8); outline: none; }
 .qb-filters button.active { background: #3c9f9c; border-color: #3c9f9c; }
 
-.qb-gallery-grid { columns: 3 260px; column-gap: 16px; }
+.qb-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+}
 .qb-item {
     position: relative;
     display: block;
     width: 100%;
     height: auto !important;
     min-height: 0 !important;
-    margin: 0 0 16px;
+    margin: 0;
     padding: 0;
     border: 1px solid rgba(255, 255, 255, .1);
     border-radius: 10px;
@@ -192,8 +197,10 @@
 
 @media (max-width: 768px) {
     .qb-games-grid { grid-template-columns: 1fr; }
-    .qb-gallery-grid { columns: 2 220px; column-gap: 12px; }
-    .qb-item { margin-bottom: 12px; }
+    .qb-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
 }
 
 @media (max-width: 560px) {
@@ -212,7 +219,7 @@
         max-width: 100%;
         white-space: normal;
     }
-    .qb-gallery-grid { columns: 1; }
+    .qb-gallery-grid { grid-template-columns: 1fr; }
     .qb-game-info { min-height: 0; }
 }
 
@@ -229,4 +236,3 @@ html.light-mode .qb-game-info span { color: #5d6262 !important; }
 html.light-mode .qb-cta a,
 html.light-mode .qb-filters button.active { background: #2d8987; border-color: #2d8987; }
 html.light-mode .qb-count { background: rgba(38, 39, 40, .82); }
-    break-inside: avoid;
