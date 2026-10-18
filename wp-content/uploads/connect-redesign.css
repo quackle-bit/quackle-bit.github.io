@@ -115,5 +115,23 @@ html.light-mode .page-id-564 .meeek-bio-links-description {
 @media (max-width: 700px) {
     .page-id-564 .meeek-bio-links-container-v5 {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .page-id-564 .meeek-bio-links-inner-container {
+        min-height: 76px;
+        margin: 0 !important;
+        padding: 14px 16px;
+    }
+
+    .page-id-564 .meeek-bio-links-description {
+        padding: 0 38px 0 14px;
+    }
+
+    .page-id-564 .meeek-bio-links-inner-content,
+    .page-id-564 .meeek-bio-links-button {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
     }
 }
