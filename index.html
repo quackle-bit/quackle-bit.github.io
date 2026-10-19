@@ -344,6 +344,12 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <script defer src="/wp-content/uploads/header-scroll.js?ver=1.1"></script>
 <script>!function(){function e(){var e=document.getElementById("mode-switch-radio");document.documentElement.classList.toggle("light-mode",!!e&&e.checked)}document.addEventListener("change",function(t){"mode-switch-radio"===t.target.id&&e()}),setTimeout(e,0),setTimeout(e,250),setTimeout(e,750)}();</script>
 
+<style id="qb-featured-css">
+.section.started .started-content .qb-featured{position:absolute;top:calc(50% + 75px);left:0;width:100%;text-align:center;z-index:2}
+.qb-featured .qb-featured-label{margin:0 0 18px;font-size:17px;font-weight:300;color:#fff;letter-spacing:.02em}
+.qb-featured .qb-featured-label strong{color:#469ca0;font-weight:500}
+@media (max-width:767px){.section.started .started-content .qb-featured{top:calc(50% + 40px)}.qb-featured .qb-featured-label{font-size:15px}}
+</style>
 </head>
 
 <body class="home wp-singular page-template page-template-template-elementor-builder page-template-template-elementor-builder-php page page-id-510 wp-custom-logo wp-theme-cvio elementor-default elementor-template-full-width elementor-kit-16 elementor-page elementor-page-510">
@@ -454,6 +460,15 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 																<p>Quirky little <strong>Indie Studio</strong>.</p>
 															</div>
 							<span class="typed-subtitle" data-tspeed="100" data-tdelay="1000"></span>
+						</div>
+
+						<!-- Featured project -->
+						<div class="qb-featured">
+							<p class="qb-featured-label">Now in development: <strong>Anotherland Above</strong></p>
+							<a target="_blank" rel="noopener" href="https://quacklebit.itch.io/anotherland-above" class="btn hover-animated">
+								<span class="circle"></span>
+								<span><span class="lnk">Follow on itch.io</span></span>
+							</a>
 						</div>
 						
 						
