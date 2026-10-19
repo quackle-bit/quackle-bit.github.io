@@ -215,3 +215,9 @@ html.light-mode .header.active {
         background: rgba(255, 255, 255, 0.8) !important;
     }
 }
+
+/* Social page intro text */
+html.light-mode .meeek-about-me-title,
+html.light-mode .meeek-about-me-description {
+    color: #4a4f4f !important;
+}
