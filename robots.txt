@@ -1,8 +1,4 @@
-# START YOAST BLOCK
-# ---------------------------
 User-agent: *
-Disallow:
+Allow: /
 
-Sitemap: https://www.quacklebit.com/sitemap_index.xml
-# ---------------------------
-# END YOAST BLOCK
+Sitemap: https://quacklebit.com/sitemap.xml
