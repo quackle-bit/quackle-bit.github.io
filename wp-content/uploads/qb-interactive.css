@@ -1,0 +1,152 @@
+/* Quackle.bit — interactive extras (pairs with qb-interactive.js) */
+:root { --qb-accent: #469ca0; --qb-card: #171717; --qb-ink: #fff; --qb-muted: rgba(255,255,255,.62); --qb-line: rgba(255,255,255,.14); }
+html.light-mode { --qb-card: #f5f6f6; --qb-ink: #262728; --qb-muted: #5d6262; --qb-line: rgba(38,39,40,.14); }
+
+/* ---------- Duck ---------- */
+.qb-duck {
+  position: absolute; left: 0; top: 0; z-index: 9990; /* top is set by JS: duck stands on the footer */
+  width: 64px; height: 64px; cursor: pointer;
+  will-change: transform; -webkit-tap-highlight-color: transparent;
+}
+.qb-duck canvas { width: 64px; height: 64px; image-rendering: pixelated; display: block; filter: drop-shadow(0 2px 0 rgba(0,0,0,.25)); }
+.qb-duck:focus-visible { outline: 2px dashed var(--qb-accent); outline-offset: 4px; }
+.qb-duck.is-controlled::after {
+  content: ""; position: absolute; left: 50%; top: -6px; width: 6px; height: 6px; margin-left: -3px;
+  background: var(--qb-accent); box-shadow: 0 0 0 2px #2f2f24; animation: qb-blink 1s steps(2) infinite;
+}
+.qb-duck-parade { pointer-events: none; position: fixed; top: auto; bottom: 6px; }
+.qb-duck-bubble {
+  position: absolute; bottom: 70px; left: 50%; transform: translate(-50%, 6px);
+  white-space: nowrap; max-width: 80vw; overflow: hidden; text-overflow: ellipsis;
+  padding: 7px 11px; font: 600 12px/1.3 inherit; letter-spacing: .02em;
+  color: #2f2f24; background: #f5f1e6; border: 2px solid #2f2f24; border-radius: 4px;
+  box-shadow: 3px 3px 0 #2f2f24; opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s;
+}
+.qb-duck-bubble::after {
+  content: ""; position: absolute; left: 50%; bottom: -8px; margin-left: -5px;
+  border: 5px solid transparent; border-top-color: #2f2f24;
+}
+.qb-duck-bubble.show { opacity: 1; transform: translate(-50%, 0); }
+@keyframes qb-blink { 50% { opacity: 0; } }
+
+/* ---------- Play in browser ---------- */
+.qb-play {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  padding: 7px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; letter-spacing: .03em; color: #fff;
+  background: rgba(20,20,20,.78); border: 1px solid rgba(255,255,255,.25);
+  backdrop-filter: blur(4px); cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.qb-play:hover, .qb-play:focus-visible { background: var(--qb-accent); border-color: var(--qb-accent); transform: scale(1.05); outline: none; }
+
+html.qb-modal-open, html.qb-modal-open body { overflow: hidden; }
+.qb-modal {
+  position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;
+  padding: 3vw; background: rgba(0,0,0,.82); animation: qb-fade .2s ease;
+}
+.qb-modal-box { width: min(1100px, 100%); }
+.qb-modal-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 10px; color: #fff; font-size: 15px; }
+.qb-modal-head a { color: rgba(255,255,255,.75) !important; font-size: 13px; margin-right: 14px; text-decoration: none; }
+.qb-modal-head a:hover { color: #fff !important; }
+.qb-modal-close { background: none; border: 1px solid rgba(255,255,255,.3); color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 15px; }
+.qb-modal-close:hover { background: var(--qb-accent); border-color: var(--qb-accent); }
+.qb-modal-frame { position: relative; aspect-ratio: 16 / 9; max-height: 78vh; margin: 0 auto; background: #000; border: 1px solid rgba(255,255,255,.15); border-radius: 10px; overflow: hidden; }
+.qb-modal-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.qb-modal-note { margin: 10px 0 0; text-align: center; color: rgba(255,255,255,.55); font-size: 12px; }
+@keyframes qb-fade { from { opacity: 0; } }
+
+/* ---------- Team: character select ---------- */
+.team-item.qb-char { cursor: pointer; }
+.team-item.qb-char .image { position: relative; }
+.qb-char-select {
+  position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+  font-size: 10px; letter-spacing: .18em; font-weight: 700; color: var(--qb-accent);
+  animation: qb-blink 1.2s steps(2) infinite; pointer-events: none;
+}
+.qb-char-card {
+  position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; gap: 9px;
+  padding: 18px 22px; text-align: left;
+  background: var(--qb-card);
+  border: 2px solid var(--qb-accent); border-radius: 6px;
+  opacity: 0; transform: scale(.97); transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.team-item.qb-char:hover .qb-char-card,
+.team-item.qb-char:focus-visible .qb-char-card,
+.team-item.qb-char.is-selected .qb-char-card { opacity: 1; transform: none; }
+.team-item.qb-char:hover .qb-char-select,
+.team-item.qb-char.is-selected .qb-char-select { opacity: 0; animation: none; }
+.team-item.qb-char.is-selected { box-shadow: 0 0 0 2px var(--qb-accent); }
+.qb-char-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.qb-char-player { font-weight: 800; font-size: 13px; color: #2f2f24; background: var(--qb-accent); padding: 2px 8px; border-radius: 3px; }
+.qb-char-class { font-size: 12px; color: var(--qb-muted); }
+.qb-stat { display: grid; grid-template-columns: 7.5em 1fr 2em; align-items: center; gap: 10px; font-size: 12px; color: var(--qb-ink); }
+.qb-stat i { height: 8px; background: var(--qb-line); border-radius: 1px; overflow: hidden; }
+.qb-stat b { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, var(--qb-accent) 0 6px, transparent 6px 8px); transition: width .6s steps(12); }
+.team-item.qb-char:hover .qb-stat b,
+.team-item.qb-char:focus-visible .qb-stat b,
+.team-item.qb-char.is-selected .qb-stat b { width: var(--v); }
+.qb-stat em { font-style: normal; text-align: right; color: var(--qb-muted); }
+.qb-char-special { margin-top: 4px; font-size: 12px; color: var(--qb-accent); }
+
+/* ---------- Awards: achievements ---------- */
+.clients-item.qb-ach { position: relative; }
+.clients-item.qb-ach:focus-within { opacity: 1; }
+.clients-item.qb-ach img { transition: transform .25s, filter .25s; }
+.clients-item.qb-ach:hover img, .clients-item.qb-ach:focus-within img { transform: translateY(-4px) scale(1.04); filter: drop-shadow(0 0 10px rgba(70,156,160,.45)); }
+.qb-ach-tip {
+  position: absolute; left: 50%; bottom: calc(100% - 6px); z-index: 5; width: max-content; max-width: 260px;
+  transform: translate(-50%, 6px); display: flex; gap: 10px; align-items: center; padding: 10px 14px;
+  background: var(--qb-card); border: 1px solid var(--qb-accent); border-radius: 8px; box-shadow: 0 10px 24px rgba(0,0,0,.3);
+  text-align: left; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.clients-item.qb-ach:hover .qb-ach-tip, .clients-item.qb-ach:focus-within .qb-ach-tip { opacity: 1; transform: translate(-50%, 0); }
+.qb-ach-tip small, .qb-toast small { display: block; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--qb-accent); }
+.qb-ach-tip strong, .qb-toast strong { display: block; font-size: 14px; color: var(--qb-ink); line-height: 1.3; }
+.qb-ach-tip em { display: block; font-style: normal; font-size: 12px; color: var(--qb-muted); }
+.qb-ach-icon { font-size: 22px; line-height: 1; }
+
+.qb-toasts { position: fixed; right: 20px; bottom: 80px; z-index: 9995; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; pointer-events: none; }
+.qb-toast {
+  display: flex; gap: 12px; align-items: center; min-width: 260px; padding: 12px 16px;
+  background: var(--qb-card); border: 1px solid var(--qb-line); border-left: 4px solid var(--qb-accent); border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.35); animation: qb-toast-in .35s cubic-bezier(.2,.9,.3,1.3);
+  transition: opacity .35s, transform .35s;
+}
+.qb-toast.out { opacity: 0; transform: translateX(30px); }
+.qb-toast-more { min-width: 0; font-size: 12px; color: var(--qb-muted); }
+@keyframes qb-toast-in { from { opacity: 0; transform: translateX(40px); } }
+
+/* ---------- Journey / level map (About) ---------- */
+.qb-journey { padding: 34px 18px 26px !important; }
+.qb-map { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0; list-style: none; margin: 0; padding: 0; }
+.qb-map::before { content: ""; position: absolute; left: 6%; right: 6%; top: 21px; border-top: 4px dotted var(--qb-line); }
+.qb-map li { position: relative; text-align: center; padding: 0 4px; }
+.qb-node {
+  position: relative; z-index: 1; display: grid; place-items: center; width: 42px; height: 42px; margin: 0 auto 12px;
+  background: var(--qb-card); border: 3px solid var(--qb-accent); font-weight: 800; font-size: 13px; color: var(--qb-ink);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.35); transition: transform .2s;
+}
+.qb-map li:hover .qb-node { transform: translateY(-4px); }
+.qb-map li.is-cleared .qb-node::after { content: "★"; position: absolute; top: -12px; right: -10px; font-size: 14px; color: #e8a33c; }
+.qb-map li.is-current .qb-node { background: var(--qb-accent); color: #fff; animation: qb-pulse 1.6s ease-in-out infinite; }
+.qb-map .qb-year { display: block; font-size: 11px; letter-spacing: .14em; color: var(--qb-accent); font-weight: 700; }
+.qb-map strong { display: block; font-size: 13px; color: var(--qb-ink); margin: 2px 0; line-height: 1.3; }
+.qb-map small { display: block; font-size: 11px; color: var(--qb-muted); line-height: 1.4; }
+.qb-here { display: inline-block; margin-top: 6px; font-size: 10px; letter-spacing: .14em; font-weight: 700; color: #e8a33c; animation: qb-blink 1s steps(2) infinite; }
+@keyframes qb-pulse { 50% { box-shadow: 0 0 0 8px rgba(70,156,160,.18), 3px 3px 0 rgba(0,0,0,.35); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .qb-duck.is-controlled::after, .qb-char-select, .qb-here, .qb-map li.is-current .qb-node { animation: none; }
+}
+@media (max-width: 767px) {
+  .qb-duck, .qb-duck canvas { width: 48px; height: 48px; }
+  .qb-duck-bubble { bottom: 54px; }
+  .qb-toasts { right: 10px; left: 10px; align-items: stretch; }
+  /* journey becomes a vertical path on phones */
+  .qb-map { grid-template-columns: 1fr; gap: 18px; }
+  .qb-map::before { left: 21px; right: auto; top: 10px; bottom: 10px; border-top: 0; border-left: 4px dotted var(--qb-line); }
+  .qb-map li { display: grid; grid-template-columns: 42px 1fr; column-gap: 16px; text-align: left; padding: 0; }
+  .qb-map li .qb-node { grid-row: span 4; margin: 0; }
+}
