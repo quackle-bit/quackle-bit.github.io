@@ -73,7 +73,7 @@
   };
   var SHEET = new Image(); SHEET.src = ART + "duck.png";
   var PEEKIMG = new Image(); PEEKIMG.src = ART + "peek.png";
-  function scl() { return innerWidth <= 767 ? 2 : 3; }             // CSS pixels per sprite pixel
+  function scl() { return innerWidth <= 767 ? 2.5 : 3; }             // CSS pixels per sprite pixel
   function dsz() { return FR * scl(); }
   function peekW() { return PW * scl(); }
   function peekH() { return PH * scl(); }
