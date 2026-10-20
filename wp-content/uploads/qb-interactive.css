@@ -1,22 +1,22 @@
 /* Quackle.bit — interactive extras (pairs with qb-interactive.js) */
-:root { --qb-accent: #469ca0; --qb-card: #171717; --qb-ink: #fff; --qb-muted: rgba(255,255,255,.62); --qb-line: rgba(255,255,255,.14); }
+:root { --qb-px: 3px; --qb-accent: #469ca0; --qb-card: #171717; --qb-ink: #fff; --qb-muted: rgba(255,255,255,.62); --qb-line: rgba(255,255,255,.14); }
 html.light-mode { --qb-card: #f5f6f6; --qb-ink: #262728; --qb-muted: #5d6262; --qb-line: rgba(38,39,40,.14); }
 
 /* ---------- Duck ---------- */
 .qb-duck {
   position: fixed; left: 0; top: 0; z-index: 9990;
-  width: 64px; height: 64px; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  width: calc(26 * var(--qb-px)); height: calc(26 * var(--qb-px)); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
   -webkit-touch-callout: none; will-change: transform; -webkit-tap-highlight-color: transparent;
 }
 .qb-duck.is-dragging, .qb-peek.is-dragging { cursor: grabbing; }
-.qb-duck canvas { transform-origin: 50% 100%; width: 64px; height: 64px; image-rendering: pixelated; display: block; filter: drop-shadow(0 2px 0 rgba(0,0,0,.25)); pointer-events: none; }
+.qb-duck canvas { transform-origin: 50% 100%; width: calc(26 * var(--qb-px)); height: calc(26 * var(--qb-px)); image-rendering: pixelated; display: block; filter: drop-shadow(0 2px 0 rgba(0,0,0,.25)); pointer-events: none; }
 .qb-duck:focus-visible, .qb-peek:focus-visible { outline: 2px dashed var(--qb-accent); outline-offset: 4px; }
 .qb-duck-parade { pointer-events: none; cursor: default; }
 .qb-duck-stars { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); font-size: 13px; letter-spacing: 3px; color: #e8a33c;
   white-space: nowrap; display: none; pointer-events: none; text-shadow: 0 1px 0 #2f2f24; }
-.qb-duck.is-stunned .qb-duck-stars { display: block; animation: qb-stars 1s linear infinite; }
+.qb-duck.is-stunned .qb-duck-stars { display: none; }   /* the stunned sprite draws its own stars */
 .qb-duck-bubble {            /* pixel speech box: notched corners, chunky 3px outline, hard drop shadow */
-  position: absolute; bottom: 76px; left: 0; transform: translateY(6px);
+  position: absolute; bottom: calc(15 * var(--qb-px) + 15px); left: 0; transform: translateY(6px);
   width: max-content; max-width: min(240px, 80vw); white-space: normal; text-align: left;
   padding: 9px 13px; font-family: "Roboto", sans-serif; font-size: 13px; font-weight: 500; line-height: 1.4;
   color: var(--qb-ink); background: var(--qb-card); border: 0; border-radius: 0;
@@ -31,7 +31,7 @@ html.light-mode { --qb-card: #f5f6f6; --qb-ink: #262728; --qb-muted: #5d6262; --
   clip-path: polygon(0 0,100% 0,100% 33.3%,83.3% 33.3%,83.3% 66.6%,66.6% 66.6%,66.6% 100%,33.3% 100%,33.3% 66.6%,16.6% 66.6%,16.6% 33.3%,0 33.3%); }
 .qb-duck-bubble::before { width: 12px; height: 6px; margin-left: -6px; background: var(--qb-card); z-index: 1;
   clip-path: polygon(0 0,100% 0,100% 50%,75% 50%,75% 100%,25% 100%,25% 50%,0 50%); }
-.qb-duck-bubble.below { bottom: auto; top: 76px; }
+.qb-duck-bubble.below { bottom: auto; top: calc(26 * var(--qb-px) + 10px); }
 .qb-duck-bubble.below::before, .qb-duck-bubble.below::after { top: auto; bottom: 100%; transform: scaleY(-1); }
 .qb-duck-bubble.show { opacity: 1; transform: translateY(0); }
 /* the hiding duck: just a long neck and a head peeking from a screen edge */
@@ -41,7 +41,7 @@ html.light-mode { --qb-card: #f5f6f6; --qb-ink: #262728; --qb-muted: #5d6262; --
   transition: transform .55s cubic-bezier(.3,1.5,.5,1);
 }
 .qb-peek.is-dragging { transition: none; }
-.qb-peek canvas { position: absolute; left: 50%; top: 50%; width: 64px; height: 80px; margin: -40px 0 0 -32px;
+.qb-peek canvas { position: absolute; left: 50%; top: 50%; width: calc(16 * var(--qb-px)); height: calc(20 * var(--qb-px)); margin: calc(-10 * var(--qb-px)) 0 0 calc(-8 * var(--qb-px));
   image-rendering: pixelated; pointer-events: none; animation: qb-neck 2.4s ease-in-out infinite alternate; }
 /* content the duck munches / hauls around (always restored by the script) */
 .qb-eaten { will-change: clip-path; }
@@ -153,9 +153,7 @@ a.qb-game:hover .qb-play, .qb-play:hover { background: var(--qb-accent); border-
   .qb-duck canvas, .qb-peek canvas, .qb-duck-stars, .qb-char-select, .qb-here, .qb-map li.is-current .qb-node { animation: none; }
 }
 @media (max-width: 767px) {
-  .qb-duck, .qb-duck canvas { width: 48px; height: 48px; }
-  .qb-duck-bubble { bottom: 60px; font-size: 12px; padding: 8px 11px; }
-  .qb-duck-bubble.below { top: 60px; }
+  .qb-duck-bubble { font-size: 12px; padding: 8px 11px; }
   .qb-toasts { right: 10px; left: 10px; align-items: stretch; }
   /* journey becomes a vertical path on phones */
   .qb-map { grid-template-columns: 1fr; gap: 18px; }
