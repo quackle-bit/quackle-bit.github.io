@@ -2,7 +2,7 @@
  * Quackle.bit — interactive extras
  *  1. Silly duck (all pages): wanders, talks, eats/drags bits of the page (always restored).
  *     Click = he hides (long neck peeks from an edge), click the head = he falls back in.
- *     Drag = reposition. Konami code = duck parade.
+ *     Drag = reposition. Type "quack" = duck parade.
  *  2. Portfolio: small ▶ icon on game cards (the card links to the game on itch.io).
  *  3. About: team "character select" stats, awards as achievements.
  * Edit the CONFIG block below to change stats; the duck's lines live in SAY (section 1). Remove the <script> tag to disable everything.
@@ -227,8 +227,10 @@
     hello: ["Quack! Welcome to Quackle.bit.", "Oh! A visitor. Act natural.", "Hi! I'm the studio duck. Unpaid.", "Welcome! Mind the pixels."],
     helloBack: ["Quack! You're back!", "Oh hey, it's you again!", "Welcome back. I kept your spot warm."],
     idle: ["Stories told in pixels. I'm one of them.", "I'm in charge of quality quacking.", "Every pixel here is placed by hand.", "I am a duck. Not a goose. Please.",
-      "Psst... try the Konami code.", "Small studio. Big heart. One duck.", "I playtest everything. By sitting on it.", "Bandung to Tokyo. I flew, obviously.",
+      "Small studio. Big heart. One duck.", "I playtest everything. By sitting on it.", "Bandung to Tokyo. I flew, obviously.",
       "Drag me somewhere with a view."],
+    hint: ["Psst... try typing \"quack\".", "Psst... type q-u-a-c-k. Trust me.", "Secret: type \"quack\" on your keyboard."],
+    hintDone: ["Encore? You know the word.", "Type \"quack\" again. I dare you."],
     night: ["It's late. Even pixels sleep.", "Shh... the devs are resting.", "Night owl? I'm a night duck."],
     stunned: ["x_x", "Who put the floor there?", "I meant to do that.", "Seeing stars... pixel ones."],
     drag: ["Whee!", "Hey, I'm walking here!", "Careful, I'm handmade!", "Ooh, a new view!"],
@@ -277,8 +279,15 @@
     social: { hello: ["Come find us everywhere!", "Follow us! I'm on all of them. Sort of."],
       idle: ["Itch.io has our games. Go play!", "Say hi on Bluesky!", "Email us! I don't read it. They do."] },
   };
+  function paradeFound() { try { return localStorage.getItem("qbParadeFound") === "1"; } catch (e) { return false; } }
   function talk(key) {                         // a line for this moment: page-specific, late-night, or general
     var pg = PAGE_SAY[PAGE], h = new Date().getHours();
+    // the "quack" secret: hinted often until someone finds the parade, then only now and then
+    if (key === "idle") {
+      var touch = window.matchMedia && matchMedia("(pointer: coarse)").matches;     // phones: usually no keyboard, so hint rarely
+      if (!paradeFound()) { if (Math.random() < (touch ? 0.05 : 0.3)) return pick(SAY.hint); }
+      else if (Math.random() < 0.04) return pick(SAY.hintDone);
+    }
     if (key === "idle" && (h >= 23 || h < 5) && Math.random() < 0.3) return pick(SAY.night);
     if (pg && pg[key] && Math.random() < 0.6) return pick(pg[key]);
     return pick(SAY[key]);
@@ -872,32 +881,56 @@
     setTimeout(function () { var first = !sessionStorage.getItem("qbDuckHello"); try { sessionStorage.setItem("qbDuckHello", "1"); } catch (_) {} main.say(first ? talk("hello") : pick(SAY.helloBack), 3200, true); }, 1800);
     watchContent(main);
 
-    // Konami code -> duck parade (hidden easter egg)
-    var CODE = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"], pos = 0;
+    // typing "quack" anywhere on the page -> duck parade (hidden easter egg)
+    var CODE = "quack".split(""), pos = 0;
     addEventListener("keydown", function (e) {
       var t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-      var k = e.key; pos = (k === CODE[pos] || k.toLowerCase() === CODE[pos]) ? pos + 1 : (k === CODE[0] ? 1 : 0);
+      var k = (e.key || "").toLowerCase(); pos = k === CODE[pos] ? pos + 1 : (k === CODE[0] ? 1 : 0);
       if (pos === CODE.length) {
         pos = 0; chime(); main.say("DUCK PARADE!", 3000, true);
+        try { localStorage.setItem("qbParadeFound", "1"); } catch (_) {}
         for (var i = 0; i < 12; i++) (function (i) {
-          setTimeout(function () { var d = new ParadeDuck(); ducks.push(d); if (i % 3 === 0) quackSound(); }, i * 180);
+          setTimeout(function () { var d = new ParadeDuck(["walk", "walk", "fly", "drop"][i % 4]); ducks.push(d); if (i % 3 === 0) quackSound(); }, i * 180);
         })(i);
       }
     });
   }
 
-  function ParadeDuck() {
+  /* parade ducks: some walk, some fly over, some drop from the sky, land, then join the march */
+  function ParadeDuck(kind) {
+    this.kind = kind || "walk";
     this.wrap = el("div", "qb-duck qb-duck-parade");
     this.canvas = el("canvas"); this.canvas.width = this.canvas.height = FR;
     this.wrap.appendChild(this.canvas); this.ctx = this.canvas.getContext("2d");
-    this.x = 1; this.dir = 1; this.speed = 2 + Math.random() * 2; this.tick = 0; this.frame = 0;
-    this.wrap.style.top = "auto"; this.wrap.style.bottom = (6 + Math.random() * 30) + "px";
+    var s = dsz();
+    this.ground = innerHeight - s - (6 + Math.random() * 30);
+    this.speed = 2 + Math.random() * 2; this.tick = 0; this.sx = 1; this.sy = 1; this.rot = 0;
+    if (this.kind === "fly") { this.x = 1; this.y = rnd(innerHeight * 0.12, innerHeight * 0.55); this.speed += 1.5; }
+    else if (this.kind === "drop") { this.x = rnd(innerWidth * 0.05, innerWidth * 0.6); this.y = -s - rnd(0, 120); this.vy = 0; this.spin = rnd(10, 18); this.landed = 0; }
+    else { this.x = 1; this.y = this.ground; }
+    this.wrap.style.top = "0";
     document.body.appendChild(this.wrap);
   }
   ParadeDuck.prototype.update = function (now, f) {
-    this.x += this.speed * f; this.tick++;
-    drawFrame(this.ctx, frameAt("walk", now), false);
-    this.wrap.style.transform = "translate(" + Math.round(this.x) + "px,0)";
+    var tag = "walk", bob = 0, s = dsz(), k = Math.min(1, 0.2 * f);
+    this.tick++;
+    if (this.kind === "fly") {
+      this.x += this.speed * f; tag = "fly"; bob = Math.sin(now / 120 + this.speed) * 6;
+    } else if (this.kind === "drop" && !this.landed) {
+      this.vy += 0.6 * f; this.y += this.vy * f; this.rot += this.spin * f * 0.5; tag = "fall";
+      if (this.y >= this.ground) {                       // touchdown: squash, puff of dust, then walk on
+        this.y = this.ground; this.rot = 0; this.landed = now; this.sx = 1.45; this.sy = 0.6;
+        burst(this.x + s / 2, this.ground + s - 4, 6, { colors: ["#d9d4c4", "#f5f1e6"], size: [3, 6], ang: -Math.PI / 2, spread: 2.6, v0: 25, v1: 60, g: 20 });
+        puff(0.06, 500, 200, 0.04);
+      }
+    } else {
+      if (this.kind === "drop" && now - this.landed < 220) tag = "land";
+      else this.x += this.speed * f;
+    }
+    this.sx += (1 - this.sx) * k; this.sy += (1 - this.sy) * k;
+    drawFrame(this.ctx, frameAt(tag, now), false);
+    this.wrap.style.transform = "translate(" + Math.round(this.x) + "px," + Math.round(this.y + bob) + "px)";
+    this.canvas.style.transform = "rotate(" + this.rot.toFixed(1) + "deg) scale(" + this.sx.toFixed(3) + "," + this.sy.toFixed(3) + ")";
   };
   ParadeDuck.prototype.remove = function () { this.wrap.remove(); this.dead = true; };
 
