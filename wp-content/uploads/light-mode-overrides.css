@@ -221,3 +221,34 @@ html.light-mode .meeek-about-me-title,
 html.light-mode .meeek-about-me-description {
     color: #4a4f4f !important;
 }
+
+/* Portfolio dropdown: links grouped under small "Games" / "Tools" headings */
+@media (min-width: 1200px) {
+    .header .top-menu-nav .qb-portfolio-menu {
+        width: 220px;
+    }
+}
+
+.header .top-menu-nav .qb-portfolio-menu li.qb-menu-label {
+    padding: 12px 20px 4px;
+    border-bottom: none;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #469ca0;
+    cursor: default;
+}
+
+.header .top-menu-nav .qb-portfolio-menu li.qb-menu-label:first-child {
+    padding-top: 6px;
+}
+
+.header .top-menu-nav .qb-portfolio-menu li.menu-item a {
+    white-space: nowrap;
+}
+
+html.light-mode .header .top-menu-nav .qb-portfolio-menu li.qb-menu-label {
+    color: #2d8987;
+}
