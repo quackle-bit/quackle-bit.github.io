@@ -1,0 +1,9 @@
+# macOS folder clutter
+.DS_Store
+
+# dependencies
+node_modules/
+
+# secrets: keys never go in this repo
+.env*
+*.pem
