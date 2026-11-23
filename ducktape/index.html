@@ -173,7 +173,7 @@
     }
     d.walking = false;
     if (!d.air && d.mode !== "bubble") d.x += (d.tx - d.x) * 0.06;
-    if (d.mode === "here" && !d.air && now - d.idleAt > 4000 + Math.random() * 3000) { d.idleAt = now; var rr = Math.random(); if (rr < 0.45) takeOff(d, now); else if (rr < 0.8 && ducks.length + eggs.length < MAX) hide(d, now); }
+    if (d.mode === "here" && !d.air && now - d.idleAt > 2000 + Math.random() * 1500) { d.idleAt = now; var rr = Math.random(); if (rr < 0.7) takeOff(d, now); else if (rr < 0.88 && ducks.length + eggs.length < MAX) hide(d, now); }
     if (d.air && d.mode === "here") {
       var A = d.air, landing = now > A.until, gy = landing ? 0 : A.ty + Math.sin(now / 400) * 10;
       d.x += (A.tx - d.x) * 0.02; d.flip = A.tx < d.x; d.jy += (gy - d.jy) * 0.04; d.jv = 0;
