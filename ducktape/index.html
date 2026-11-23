@@ -10,14 +10,22 @@
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #101010; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
   canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; image-rendering: pixelated; }
-  #fs { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: rgba(255,255,255,.08); cursor: pointer; z-index: 2; }
-  #fs svg { width: 24px; height: 24px; display: block; margin: auto; shape-rendering: crispEdges; }
+  #fs { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 54px; height: 54px; padding: 0; border: 0; background: none; cursor: pointer; z-index: 2; image-rendering: pixelated; }
+  #fs svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+  #fs:active svg { transform: translateY(3px); }
+  #fs:active .lip { display: none; }
   #fs[hidden] { display: none; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<button id="fs" aria-label="Full screen" hidden><svg viewBox="0 0 12 12" fill="rgba(255,255,255,.7)"><path d="M0 0h4v1H1v3H0zM8 0h4v4h-1V1H8zM0 8h1v3h3v1H0zM11 8h1v4H8v-1h3z"/></svg></button>
+<button id="fs" aria-label="Full screen" hidden><svg viewBox="0 0 18 18">
+  <path fill="#0a0a0a" d="M2 0h14v1h1v1h1v14h-1v1h-1v1H2v-1H1v-1H0V2h1V1h1z"/>
+  <path class="lip" fill="#1a1a1a" d="M1 14h16v2h-1v1H2v-1H1z"/>
+  <path fill="#3b3b3b" d="M2 1h14v1h1v11H1V2h1z"/>
+  <path fill="#565656" d="M2 1h14v1H2zM1 2h1v10H1z"/>
+  <path fill="#f4efe4" d="M4 4h4v1H5v3H4zM10 4h4v4h-1V5h-3zM4 9h1v2h3v1H4zM13 9h1v3h-4v-1h3z"/>
+</svg></button>
 <script>
 (function () {
   "use strict";
@@ -156,7 +164,7 @@
   ducks.push(newDuck(0.5));
   function layout() {   // spread ducks and eggs evenly across the floor
     var all = ducks.concat(eggs), n = all.length;
-    var r0 = keyRect(0), span = (r0.w + 6) * NK, left = r0.x - 3;
+    var r0 = keyRect(0), span = r0.w * NK, left = r0.x;
     all.forEach(function (o, i) { o.tx = (left + span * (i + 0.5) / Math.max(n, 1)) / W; });
   }
   function takeOff(d, now) {   // fly somewhere in the sky, hover a bit, then glide back down
@@ -170,8 +178,15 @@
   function hide(d, now) { d.mode = "hiding"; d.flip = Math.random() < 0.5; quack(1.8, 0.3); whoosh(); }
   var NOTES = [0, 2, 4, 5, 7, 9, 11, 12].map(function (n) { return Math.pow(2, n / 12); });   // do re mi fa sol la si do, equal temperament
   var NK = 8, KEYCOL = ["#ff6b6b", "#ff9f43", "#f6c945", "#9be37a", "#56bebc", "#8fb8ff", "#b48cff", "#ff8fc8"], keyLit = [0, 0, 0, 0, 0, 0, 0, 0];
-  function keyRect(k) { var s = bigScale(), kw = Math.min(W * 0.94, 600) / NK, x0 = W / 2 - kw * NK / 2, y = floorY() + FR * s * 0.5 + 6;
-    return { x: x0 + k * kw + 3, y: y, w: kw - 6, h: Math.max(90, 34 * s) }; }
+  function U() { return Math.max(2, Math.round(bigScale())); }   // one "art pixel" for the UI
+  function keyRect(k) { var u = U(), kw = Math.floor(Math.min(W * 0.94, 600) / NK / u) * u, x0 = Math.round((W / 2 - kw * NK / 2) / u) * u, y = Math.round((floorY() + FR * bigScale() * 0.5 + 6) / u) * u;
+    return { x: x0 + k * kw, y: y, w: kw, h: 30 * u }; }
+  function pxPanel(x, y, w, h, u, fill, light, dark, line) {   // pixel box: stepped corners, outline, top light, bottom shade
+    ctx.fillStyle = line; ctx.fillRect(x + u, y, w - 2 * u, h); ctx.fillRect(x, y + u, w, h - 2 * u);
+    ctx.fillStyle = dark; ctx.fillRect(x + u, y + u, w - 2 * u, h - 2 * u);
+    ctx.fillStyle = fill; ctx.fillRect(x + u, y + u, w - 2 * u, h - 4 * u);
+    ctx.fillStyle = light; ctx.fillRect(x + 2 * u, y + u, w - 4 * u, u); ctx.fillRect(x + u, y + 2 * u, u, h - 6 * u);
+  }
   function pianoTone(k) {   // soft plucked piano note (C D E G A) under the quack
     var c = actx(); if (!c) return;
     var f = [523.25, 587.33, 659.25, 783.99, 880][k], t = c.currentTime;
@@ -181,29 +196,34 @@
       o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 1.2);
     });
   }
-  function keyAt(px_) { var r0 = keyRect(0), kw = r0.w + 6; return Math.max(0, Math.min(NK - 1, Math.floor((px_ - (r0.x - 3)) / kw))); }
+  function keyAt(px_) { var r0 = keyRect(0); return Math.max(0, Math.min(NK - 1, Math.floor((px_ - r0.x) / r0.w))); }
   function noteOf(d) { return NOTES[keyAt(d.x * W)]; }
   function playKey(k, now) {
     keyLit[k] = 1; quack(NOTES[k] * 0.9, 0.4);
     ducks.forEach(function (d) { if (d.mode === "here" && !d.air && keyAt(d.x * W) === k && d.jy === 0) { d.jv = -6; d.sq = 0.7; setTag(d, "jump", 0, now); } });
   }
-  function drawKeys() {   // 8 white keys (do re mi fa sol la si do) with black keys between, like a tiny piano
-    var s = bigScale(), r0 = keyRect(0), kw = r0.w + 6;
-    ctx.fillStyle = "#2a2a2a"; ctx.fillRect(r0.x - 3 - s * 2, r0.y - s * 3, kw * NK + s * 4, r0.h + s * 5);   // case
-    ctx.fillStyle = "#c0392b"; ctx.fillRect(r0.x - 3 - s * 2, r0.y - s * 3, kw * NK + s * 4, s);              // felt strip
-    for (var k = 0; k < NK; k++) {
-      var r = keyRect(k), lit = keyLit[k]; keyLit[k] *= 0.88; var press = lit > 0.3 ? s : 0;
-      ctx.fillStyle = lit > 0.3 ? "#d8d2c4" : "#f4efe4"; ctx.fillRect(r.x, r.y + press, r.w, r.h - s - press);
-      ctx.fillStyle = "#bdb6a6"; ctx.fillRect(r.x, r.y + r.h - s * 2, r.w, s);                                 // key lip
-      ctx.globalAlpha = 0.5 + lit * 0.5; ctx.fillStyle = KEYCOL[k];                                             // colour dot so little ones can tell them apart
-      ctx.fillRect(r.x + r.w / 2 - s * 1.5, r.y + r.h - s * 6 + press, s * 3, s * 3); ctx.globalAlpha = 1;
+  function drawKeys() {   // pixel-art piano: 8 white keys (do re mi fa sol la si do) and black keys like a real octave
+    var u = U(), r0 = keyRect(0), kw = r0.w, n = NK, x0 = r0.x - 3 * u, y0 = r0.y - 4 * u, cw = kw * n + 6 * u, ch = r0.h + 8 * u;
+    pxPanel(x0, y0, cw, ch, u, "#3a2a24", "#5a4238", "#241914", "#0a0a0a");                  // wooden case
+    ctx.fillStyle = "#b8333a"; ctx.fillRect(r0.x, r0.y - u, kw * n, u);                     // red felt
+    for (var k = 0; k < n; k++) {
+      var x = r0.x + k * kw, lit = keyLit[k]; keyLit[k] *= 0.88; var dn = lit > 0.3 ? u : 0, h = r0.h;
+      ctx.fillStyle = "#0a0a0a"; ctx.fillRect(x, r0.y, kw, h);                                // gap/outline
+      ctx.fillStyle = "#b9b1a0"; ctx.fillRect(x + u, r0.y + dn, kw - 2 * u, h - u - dn);      // shade
+      ctx.fillStyle = dn ? "#ddd5c4" : "#f6f1e6"; ctx.fillRect(x + u, r0.y + dn, kw - 2 * u, h - 4 * u);
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(x + u, r0.y + dn, u, h - 5 * u);                // left light
+      ctx.fillStyle = KEYCOL[k]; ctx.globalAlpha = 0.55 + lit * 0.45;                         // colour dot
+      var dx = x + Math.round((kw / 2) / u) * u - u; ctx.fillRect(dx, r0.y + h - 8 * u + dn, 2 * u, 2 * u); ctx.globalAlpha = 1;
     }
-    [0, 1, 3, 4, 5].forEach(function (k) {   // black keys like a real octave: none between mi-fa and si-do
-      var r = keyRect(k), bw = r.w * 0.5, bx = r.x + r.w + 3 - bw / 2;
-      ctx.fillStyle = "#151515"; ctx.fillRect(bx, r.y, bw, r.h * 0.58);
-      ctx.fillStyle = "#3a3a3a"; ctx.fillRect(bx + s, r.y + r.h * 0.58 - s * 2, bw - s * 2, s);
+    [0, 1, 3, 4, 5].forEach(function (k) {
+      var bw = Math.round(kw * 0.55 / u) * u, bx = r0.x + (k + 1) * kw - bw / 2, bh = Math.round(r0.h * 0.58 / u) * u;
+      bx = Math.round(bx / u) * u;
+      ctx.fillStyle = "#0a0a0a"; ctx.fillRect(bx, r0.y, bw, bh);
+      ctx.fillStyle = "#262626"; ctx.fillRect(bx + u, r0.y, bw - 2 * u, bh - 3 * u);
+      ctx.fillStyle = "#4a4a4a"; ctx.fillRect(bx + u, r0.y, u, bh - 4 * u); ctx.fillRect(bx + u, r0.y + bh - 3 * u, bw - 2 * u, u);
     });
   }
+
   /* little tunes: a list of [key, beats]; each note is a quack on that piano key */
   var seqTimers = [];
   function playSeq(notes, beat, onNote, done) {
@@ -264,7 +284,7 @@
 
 
   var songOn = false;
-  function songRect() { var r0 = keyRect(0), w = 132, h = 48; return { x: W / 2 - w / 2, y: r0.y + r0.h + 22, w: w, h: h }; }
+  function songRect() { var r0 = keyRect(0), u = U(), w = 56 * u, h = 18 * u; return { x: Math.round((W / 2 - w / 2) / u) * u, y: r0.y + r0.h + 12 * u, w: w, h: h }; }
   function stopSong() { seqTimers.forEach(clearTimeout); seqTimers = []; songOn = false; ducks.forEach(function (d) { d.singing = false; }); }
   function toggleSong() {
     if (songOn) { stopSong(); return; }
@@ -273,15 +293,18 @@
     SONG.forEach(function (n) { if (n[0] !== null) seqTimers.push(setTimeout(function () { singNote(n[0], performance.now()); }, t)); t += n[1] * beat; });
     seqTimers.push(setTimeout(function () { songOn = false; }, t));
   }
-  function drawSongButton(now) {
-    var r = songRect(), s = bigScale();
-    ctx.fillStyle = songOn ? "#2d8987" : "#1f1f1f"; ctx.fillRect(r.x, r.y, r.w, r.h);
-    ctx.fillStyle = "rgba(255,255,255,.12)"; ctx.fillRect(r.x, r.y, r.w, 2);
-    ctx.fillStyle = "#f4efe4"; var cx = r.x + 22, cy = r.y + r.h / 2;
-    if (songOn) { ctx.fillRect(cx - 7, cy - 8, 5, 16); ctx.fillRect(cx + 2, cy - 8, 5, 16); }                       // pause
-    else for (var i = 0; i < 8; i++) ctx.fillRect(cx - 6 + i * 2, cy - 8 + i, 2, 16 - i * 2);                      // play
-    for (var k = 0; k < 5; k++) drawSprite(0, r.x + 48 + k * 17, cy + (songOn ? Math.sin(now / 150 + k) * 2 : 0), 0.9, false, 0, k ? k : 0);   // five little ducks
+  var songPress = 0;
+  function drawSongButton(now) {   // pixel button: play/pause icon + five little ducks
+    var r = songRect(), u = U(), dn = (songPress > now ? u : 0) + (songOn ? u : 0);
+    ctx.fillStyle = "#0a0a0a"; ctx.fillRect(r.x + u, r.y + 3 * u, r.w - 2 * u, r.h - 2 * u);   // drop shadow
+    pxPanel(r.x, r.y + dn, r.w, r.h - u, u, songOn ? "#2f9e9b" : "#f6c945", songOn ? "#6fd3cf" : "#fff1a8", songOn ? "#1d6866" : "#b8862a", "#0a0a0a");
+    var cx = r.x + 5 * u, cy = r.y + dn + 5 * u, ic = "#0a0a0a";
+    ctx.fillStyle = ic;
+    if (songOn) { ctx.fillRect(cx, cy, 2 * u, 7 * u); ctx.fillRect(cx + 3 * u, cy, 2 * u, 7 * u); }
+    else for (var i = 0; i < 5; i++) ctx.fillRect(cx + i * u, cy - u + i * u, u, (9 - 2 * i) * u);
+    for (var k = 0; k < 5; k++) drawSprite(0, r.x + 18 * u + k * 8 * u, r.y + dn + 7 * u + (songOn ? Math.round(Math.sin(now / 150 + k)) * u : 0), u / 2.6, false, 0, k);
   }
+
 
   function pokeDuck(d, x, y, now) {
     d.idleAt = now; d.taps = d.taps.filter(function (t) { return now - t < 1800; }); d.taps.push(now);
@@ -438,7 +461,7 @@
       else if (d.mode === "bubble") { var bb = box(d); if (Math.hypot(x - bb.x, y - bb.y) < bb.r * 1.4) { d.mode = "falling"; d.egg = false; d.jv = 0; burst(bb.x, bb.y, 5); blip(1200, 400, 0.15); emptyTaps = []; return; } } }
     for (i = 0; i < eggs.length; i++) { var eb = eggBox(eggs[i]); if (Math.hypot(x - eb.x, y - eb.y) < eb.ry * 1.6) { emptyTaps = []; tapEgg(eggs[i], now); return; } }
     for (i = 0; i < bubbles.length; i++) { var bu = bubbles[i]; if (Math.hypot(x - (bu.cx || bu.x), y - bu.y) < bu.r + 18) { popBubble(i, now); emptyTaps = []; return; } }
-    var sr = songRect(); if (x >= sr.x && x <= sr.x + sr.w && y >= sr.y && y <= sr.y + sr.h) { emptyTaps = []; toggleSong(); return; }
+    var sr = songRect(); if (x >= sr.x && x <= sr.x + sr.w && y >= sr.y && y <= sr.y + sr.h) { emptyTaps = []; songPress = now + 120; toggleSong(); return; }
     for (i = 0; i < NK; i++) { var kr = keyRect(i); if (x >= kr.x - 3 && x <= kr.x + kr.w + 3 && y >= kr.y - 6 && y <= kr.y + kr.h + 6) { emptyTaps = []; playKey(i, now); return; } }
     burst(x, y, 3); blip(500 + Math.random() * 400, 300, 0.12);
     emptyTaps = emptyTaps.filter(function (t) { return now - t < 900; }); emptyTaps.push(now);
