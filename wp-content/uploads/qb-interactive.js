@@ -134,9 +134,19 @@
       master.connect(lp); lp.connect(audio.destination);
       dry = audio.createGain(); dry.gain.value = VOL; dry.connect(audio.destination);   // samples skip the dulling filter
     }
-    if (audio.state === "suspended") audio.resume();
+    if (audio.state !== "running") audio.resume();          // "suspended", or "interrupted" on iOS after a call/background
     return audio;
   }
+  // iPhone/iPad: Safari only lets a page start sound from a tap. The duck often quacks from a timer, so open the
+  // audio on the first tap/key anywhere (with a silent 1-sample sound) and wake it up again if iOS pauses it.
+  function unlockAudio() {
+    try {
+      if (audio && audio.state === "running") return;
+      var c = actx(), b = c.createBuffer(1, 1, 22050), s = c.createBufferSource();
+      s.buffer = b; s.connect(c.destination); s.start(0);
+    } catch (e) {}
+  }
+  ["touchend", "pointerup", "click", "keydown"].forEach(function (t) { addEventListener(t, unlockAudio, true); });
   function jit(v, amt) { return v * (1 + (Math.random() * 2 - 1) * amt); }      // tiny random pitch so repeats never sound identical
   // a soft blip: quick fade in, smooth fade out, optional pitch glide
   function blip(type, f0, f1, dur, vol, delay) {
