@@ -72,6 +72,35 @@
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur);
   }
 
+  // same soft sound effects as the duck on the main site
+  function puff(dur, f0, f1, vol) {
+    var c = actx(); if (!c) return;
+    try {
+      var t = c.currentTime, len = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) { var k = i / len; d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * Math.min(1, k * 1.15)) * (1 - k); }
+      var src = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; fl.type = "lowpass"; fl.Q.value = 0.7; fl.frequency.setValueAtTime(f0, t);
+      if (f1) fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.value = vol; src.connect(fl); fl.connect(g); g.connect(c.destination); src.start(t);
+    } catch (e) {}
+  }
+  function tone(type, f0, f1, dur, vol, delay) {
+    var c = actx(); if (!c) return;
+    try {
+      var t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.03);
+    } catch (e) {}
+  }
+  function jit(v, a) { return v * (1 + (Math.random() * 2 - 1) * a); }
+  function whoosh() { puff(0.34, 300, 1500, 0.16); }
+  function thud() { tone("sine", jit(120, 0.08), 48, 0.18, 0.22); puff(0.07, 500, 200, 0.07); }
+  function boing() { var f = jit(300, 0.1); tone("sine", f, f * 1.9, 0.18, 0.08); tone("sine", f * 1.9, f * 1.5, 0.13, 0.045, 0.1); }
+  function flap() { puff(0.06, 650, 350, 0.08); }
+  function bloop() { tone("sine", jit(420, 0.06), 760, 0.1, 0.07); }
+  function chime() { [660, 880, 1320].forEach(function (f, i) { tone("sine", f, f, 0.24, 0.05, i * 0.08); }); }
+
   /* ---------- background particles ---------- */
   var COLORS = ["#56bebc", "#f6c945", "#ff8fa3", "#9be37a", "#8fb8ff", "#ffffff"];
   var bg = [];
@@ -100,12 +129,12 @@
   function takeOff(d, now) {   // fly somewhere in the sky, hover a bit, then glide back down
     if (d.mode !== "here" || d.air) return;
     d.air = { tx: 0.12 + Math.random() * 0.76, ty: -(H * (0.15 + Math.random() * 0.3)), until: now + 2500 + Math.random() * 3000 };
-    d.jv = 0; quack(1.6, 0.3);
+    d.jv = 0; d.flapAt = 0; quack(1.6, 0.3); whoosh();
   }
   function setTag(d, tag, ms, now) { d.tag = tag; d.until = ms ? now + ms : 0; d.tagStart = now; }
   function box(d) { var s = bigScale(); return { x: d.x * W, y: floorY() + d.jy, s: s, r: FR * s * 0.42 }; }
   function peekBox(d) { var s = bigScale() * 0.8; return { x: d.x * W, y: H - 16 * s * 0.5, w: 16 * s, h: 20 * s, s: s }; }
-  function hide(d, now) { d.mode = "hiding"; d.flip = Math.random() < 0.5; quack(1.8, 0.3); blip(700, 200, 0.3); }
+  function hide(d, now) { d.mode = "hiding"; d.flip = Math.random() < 0.5; quack(1.8, 0.3); whoosh(); }
   var NOTES = [1.0, 1.12, 1.26, 1.5, 1.68];   // do re mi sol la, left to right
   var KEYCOL = ["#ff8fa3", "#f6c945", "#9be37a", "#56bebc", "#8fb8ff"], keyLit = [0, 0, 0, 0, 0];
   function keyRect(k) { var s = bigScale(), kw = Math.min(W * 0.9, 560) / 5, x0 = W / 2 - kw * 2.5, y = floorY() + FR * s * 0.5 + 6;
@@ -131,22 +160,22 @@
     var b = box(d); d.sq = 0.7;
     if (d.taps.length >= 6) {
       d.taps = [];
-      if (ducks.filter(function (o) { return o.mode !== "bubble"; }).length > 1) { d.mode = "bubble"; d.air = null; d.bv = 0; quack(2, 0.4); blip(500, 1500, 0.5); word(b.x, b.y - b.r * 1.4, "bye!"); return; }
+      if (ducks.filter(function (o) { return o.mode !== "bubble"; }).length > 1) { d.mode = "bubble"; d.air = null; d.bv = 0; quack(2, 0.4); bloop(); word(b.x, b.y - b.r * 1.4, "bye!"); return; }
       setTag(d, "stunned", 1000, now); quack(0.9, 0.5); burst(x, y, 10); return;
     }
-    if (!d.air && d.jy === 0) d.jv = -6;
+    if (!d.air && d.jy === 0) { d.jv = -6; boing(); }
     setTag(d, d.air ? "fly" : "jump", 0, now);
     keyLit[keyAt(d.x * W)] = 1; quack(noteOf(d) * 1.2, 0.45); burst(b.x, b.y - b.r, 3); word(b.x, b.y - b.r * 1.2, "\u266A");
   }
   function tapPeek(d, now) {   // tumble in from the sky; lays an egg on landing if there is room
     d.mode = "falling"; d.jy = -floorY() - FR * bigScale(); d.jv = 0; d.egg = ducks.length + eggs.length < MAX;
-    quack(1.3, 0.5); blip(900, 300, 0.4);
+    quack(1.3, 0.5); whoosh();
   }
   function tapEgg(e, now) {
     e.hits++; e.shake = 1; blip(300 + e.hits * 120, 200, 0.1); var b = eggBox(e); burst(b.x, b.y, 3);
     if (e.hits >= e.need) {
       eggs.splice(eggs.indexOf(e), 1); var d = newDuck(e.x); d.tx = e.tx; d.sq = 0.5; d.jv = -12; setTag(d, "jump", 0, now); ducks.push(d); layout();
-      burst(b.x, b.y, 13); word(b.x, b.y - 40, "peep!"); quack(1.9, 0.5);
+      burst(b.x, b.y, 13); word(b.x, b.y - 40, "peep!"); quack(1.9, 0.5); chime();
     }
   }
   /* pixel-art egg, 10x12: o = outline, w = shell, s = shade, y = spot, c = crack */
@@ -176,9 +205,10 @@
     if (d.mode === "here" && !d.air && now - d.idleAt > 2000 + Math.random() * 1500) { d.idleAt = now; var rr = Math.random(); if (rr < 0.7) takeOff(d, now); else if (rr < 0.88 && ducks.length + eggs.length < MAX) hide(d, now); }
     if (d.air && d.mode === "here") {
       var A = d.air, landing = now > A.until, gy = landing ? 0 : A.ty + Math.sin(now / 400) * 10;
+      if (now > (d.flapAt || 0)) { d.flapAt = now + 380; flap(); }
       d.x += (A.tx - d.x) * 0.02; d.flip = A.tx < d.x; d.jy += (gy - d.jy) * 0.04; d.jv = 0;
       if (!landing && Math.abs(A.tx - d.x) < 0.01 && Math.random() < 0.01) A.tx = 0.12 + Math.random() * 0.76;
-      if (landing && d.jy > -3) { d.jy = 0; d.air = null; d.tx = d.x; d.sq = 0.8; setTag(d, "land", 150, now); d.idleAt = now; }
+      if (landing && d.jy > -3) { d.jy = 0; d.air = null; d.tx = d.x; d.sq = 0.8; thud(); setTag(d, "land", 150, now); d.idleAt = now; }
     }
     if (d.mode === "hiding") { d.jy += 18; if (d.jy > H) { d.mode = "peek"; d.peekAt = now; } }
     if (d.mode === "peek") {
@@ -190,7 +220,7 @@
     if (d.mode === "falling") {
       d.jv += 1.2; d.jy += d.jv;
       if (d.jy >= 0) {
-        d.jy = 0; d.jv = 0; d.mode = "here"; d.sq = 0.6; setTag(d, "stunned", 1000, now); b = box(d); burst(b.x, b.y + b.r, 8); blip(200, 60, 0.3);
+        d.jy = 0; d.jv = 0; d.mode = "here"; d.sq = 0.6; setTag(d, "stunned", 1000, now); b = box(d); burst(b.x, b.y + b.r, 8); thud();
         if (d.egg && ducks.length + eggs.length < MAX) { d.egg = false; eggs.push({ x: d.x, tx: d.x, hits: 0, need: 3 + ((Math.random() * 2) | 0), shake: 1 }); layout(); word(b.x, b.y - b.r * 1.2, "plop!"); }
       }
     } else if (d.mode === "here" && !d.air && (d.jv || d.jy)) { d.jv += 1.1; d.jy += d.jv; if (d.jy >= 0) { d.jy = 0; d.jv = 0; d.sq = 0.8; if (d.tag === "jump") setTag(d, "land", 150, now); } }
