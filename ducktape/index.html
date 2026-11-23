@@ -10,10 +10,14 @@
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #101010; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
   canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; image-rendering: pixelated; }
+  #fs { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 44px; height: 44px; padding: 0; border: 0; border-radius: 10px; background: rgba(255,255,255,.08); cursor: pointer; z-index: 2; }
+  #fs svg { width: 24px; height: 24px; display: block; margin: auto; shape-rendering: crispEdges; }
+  #fs[hidden] { display: none; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<button id="fs" aria-label="Full screen" hidden><svg viewBox="0 0 12 12" fill="rgba(255,255,255,.7)"><path d="M0 0h4v1H1v3H0zM8 0h4v4h-1V1H8zM0 8h1v3h3v1H0zM11 8h1v4H8v-1h3z"/></svg></button>
 <script>
 (function () {
   "use strict";
@@ -277,6 +281,18 @@
   });
   document.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
   document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
+
+  /* ---------- full screen button (hidden where the browser can't do it, e.g. iPhone Safari) ---------- */
+  var fsBtn = document.getElementById("fs"), root = document.documentElement;
+  var reqFS = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (reqFS) {
+    fsBtn.hidden = false;
+    fsBtn.addEventListener("click", function () {
+      actx();
+      if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else { var r = reqFS.call(root); if (r && r.catch) r.catch(function () {}); }
+    });
+  }
 
   /* ---------- loop ---------- */
   function frame(now) {
