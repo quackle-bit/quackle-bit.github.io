@@ -152,7 +152,7 @@
   function keyAt(px_) { var r0 = keyRect(0), kw = r0.w + 6; return Math.max(0, Math.min(4, Math.floor((px_ - (r0.x - 3)) / kw))); }
   function noteOf(d) { return NOTES[keyAt(d.x * W)]; }
   function playKey(k, now) {
-    keyLit[k] = 1; quack(NOTES[k] * 1.2, 0.4); pianoTone(k);
+    keyLit[k] = 1; quack(NOTES[k] * 1.2, 0.4);
     ducks.forEach(function (d) { if (d.mode === "here" && !d.air && keyAt(d.x * W) === k && d.jy === 0) { d.jv = -6; d.sq = 0.7; setTag(d, "jump", 0, now); } });
   }
   function drawKeys() {   // 5 white keys (do re mi sol la) with black keys between, like a tiny piano
@@ -182,7 +182,7 @@
     }
     if (!d.air && d.jy === 0) { d.jv = -6; boing(); }
     setTag(d, d.air ? "fly" : "jump", 0, now);
-    keyLit[keyAt(d.x * W)] = 1; quack(noteOf(d) * 1.2, 0.4); pianoTone(keyAt(d.x * W)); burst(b.x, b.y - b.r, 3); word(b.x, b.y - b.r * 1.2, "\u266A");
+    keyLit[keyAt(d.x * W)] = 1; quack(noteOf(d) * 1.2, 0.4); burst(b.x, b.y - b.r, 3); word(b.x, b.y - b.r * 1.2, "\u266A");
   }
   function tapPeek(d, now) {   // tumble in from the sky; lays an egg on landing if there is room
     d.mode = "falling"; d.jy = -floorY() - FR * bigScale(); d.jv = 0; d.egg = ducks.length + eggs.length < MAX;
