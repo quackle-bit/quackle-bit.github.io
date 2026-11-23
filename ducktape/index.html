@@ -241,12 +241,17 @@
   }
 
   /* the "Five Little Ducks" button under the piano: the whole song sung in quacks (do=0 ... high do=7) */
-  var SONG = [
-    [4, .5], [2, .5], [2, .5], [2, 1], [3, .5], [2, .5], [1, 1], [1, 1.5], [-1, .5],         // Five little ducks went out one day
-    [2, .5], [0, .5], [0, .5], [0, 1], [1, .5], [2, .5], [1, 1], [1, 1.5], [-1, .5],         // Over the hills and far away
-    [4, .5], [4, .5], [2, .5], [2, .5], [4, .5], [4, .5], [4, .5], [4, 1.5], [-1, .5],       // Mother duck said quack quack quack quack
-    [2, .5], [2, .5], [1, .5], [1, .5], [2, .5], [1, .5], [0, .5], [1, .5], [0, 2]           // But only four little ducks came back
+  var SONG = [   // C major, from easybreezypianotutorials.com (C=0 D=1 E=2 F=3 G=4); [key, beats]
+    [2, 1], [4, .5], [4, .5], [4, 1], [2, 1],     // Five little ducks went
+    [2, 1], [1, 1], [1, 2],                       // out one day
+    [1, 1], [4, .5], [4, .5], [4, 1], [1, 1],     // Over the hill and
+    [1, 1], [0, 1], [0, 2],                       // far away
+    [2, .5], [2, .5], [4, 1], [4, 1], [2, 1],     // Mother duck said "Quack,
+    [2, 1], [1, 1], [1, 1.5], [1, .5],            // quack, quack, quack" but
+    [4, 1], [4, 1], [4, 1], [3, .5], [3, .5],     // only four little
+    [2, 1], [1, 1], [0, 2]                        // ducks came back
   ];
+
   var songOn = false;
   function songRect() { var r0 = keyRect(0), w = 132, h = 48; return { x: W / 2 - w / 2, y: r0.y + r0.h + 22, w: w, h: h }; }
   function stopSong() { seqTimers.forEach(clearTimeout); seqTimers = []; songOn = false; ducks.forEach(function (d) { d.singing = false; }); }
