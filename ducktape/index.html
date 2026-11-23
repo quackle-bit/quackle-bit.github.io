@@ -23,7 +23,7 @@
   "use strict";
   var ART = (!/^https?:/.test(location.protocol) ? "https://quacklebit.com" : "") + "/wp-content/uploads/qb-duck/", FR = 26;
   var TAGS = {
-    idle: { from: 0, d: [400, 300, 400, 300] }, walk: { from: 8, d: [100, 100] }, jump: { from: 10, d: [100] },
+    idle: { from: 0, d: [400, 300, 400, 300] }, sleepy: { from: 4, d: [300, 200, 200, 300] }, walk: { from: 8, d: [100, 100] }, jump: { from: 10, d: [100] },
     fly: { from: 11, d: [100, 100] }, eat: { from: 13, d: [100, 100] }, gulp: { from: 15, d: [200] }, burp: { from: 16, d: [300] },
     stunned: { from: 17, d: [200, 200, 200, 200, 200] }, land: { from: 22, d: [100] }, fall: { from: 23, d: [100, 100] }
   };
@@ -32,17 +32,42 @@
     var m = t % total; for (i = 0; i < T.d.length; i++) { if (m < T.d[i]) return T.from + i; m -= T.d[i]; }
     return T.from;
   }
-  var SHEET = new Image(); SHEET.src = ART + "duck.png";
+  var SHEET = new Image(); SHEET.crossOrigin = "anonymous"; SHEET.src = ART + "duck.png";
+  /* colourful ducks: each one gets the same art with its hue shifted (the cream body gets a little colour so the shift shows) */
+  var HUES = [null, 200, 320, 110, 270, 20, 170];
+  function tinted(img, hue) {
+    if (hue == null) return img;
+    try {
+      var c = document.createElement("canvas"); c.width = img.naturalWidth; c.height = img.naturalHeight;
+      var x = c.getContext("2d"); x.drawImage(img, 0, 0);
+      var d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+      for (var i = 0; i < p.length; i += 4) {
+        if (!p[i + 3]) continue;
+        var r = p[i] / 255, g = p[i + 1] / 255, b = p[i + 2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, sat = 0, h = 0;
+        if (mx !== mn) { var dd = mx - mn; sat = l > 0.5 ? dd / (2 - mx - mn) : dd / (mx + mn);
+          h = mx === r ? (g - b) / dd + (g < b ? 6 : 0) : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; h *= 60; }
+        if (l < 0.22) continue;                                   // keep the dark outline and eye
+        h = (h + hue) % 360; if (sat < 0.45) sat = 0.45; if (l > 0.82) l = 0.82;
+        var q = l < 0.5 ? l * (1 + sat) : l + sat - l * sat, pp = 2 * l - q;
+        var f = function (t) { t = (t + 1) % 1; return t < 1 / 6 ? pp + (q - pp) * 6 * t : t < 0.5 ? q : t < 2 / 3 ? pp + (q - pp) * (2 / 3 - t) * 6 : pp; };
+        p[i] = f(h / 360 + 1 / 3) * 255; p[i + 1] = f(h / 360) * 255; p[i + 2] = f(h / 360 - 1 / 3) * 255;
+      }
+      x.putImageData(d, 0, 0); return c;
+    } catch (e) { return img; }   // if the art can't be read (cross-origin), fall back to the plain duck
+  }
+  var SHEETS = [], PEEKS = [];
+  function buildTints() { if (!SHEET.naturalWidth || !PEEK.naturalWidth || SHEETS.length) return; HUES.forEach(function (h) { SHEETS.push(tinted(SHEET, h)); PEEKS.push(tinted(PEEK, h)); }); }
   var cv = document.getElementById("c"), ctx = cv.getContext("2d"), W = 0, H = 0, DPR = 1;
   function resize() {
     DPR = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
     cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.imageSmoothingEnabled = false;
   }
   addEventListener("resize", resize); resize();
-  function drawSprite(idx, x, y, s, flip, rot) {   // x,y = center of the frame
+  function drawSprite(idx, x, y, s, flip, rot, hue) {   // x,y = center of the frame
     if (!SHEET.naturalWidth) return;
+    var img = (hue && SHEETS[hue]) || SHEET;
     ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); if (flip) ctx.scale(-1, 1);
-    ctx.drawImage(SHEET, idx * FR, 0, FR, FR, -FR * s / 2, -FR * s / 2, FR * s, FR * s); ctx.restore();
+    ctx.drawImage(img, idx * FR, 0, FR, FR, -FR * s / 2, -FR * s / 2, FR * s, FR * s); ctx.restore();
   }
 
   /* ---------- sound ---------- */
@@ -116,11 +141,18 @@
   function word(x, y, t) { fx.push({ k: "t", x: x, y: y, vx: (Math.random() - 0.5) * 1.5, vy: -2.2, t: t || WORDS[(Math.random() * WORDS.length) | 0], c: COLORS[(Math.random() * 5) | 0], life: 1 }); }
 
   /* ---------- ducks (start with 1, max 5 incl. eggs) ---------- */
-  var PEEK = new Image(); PEEK.src = ART + "peek.png";
+  var PEEK = new Image(); PEEK.crossOrigin = "anonymous"; PEEK.src = ART + "peek.png";
+  SHEET.onload = PEEK.onload = buildTints;
   var MAX = 5, ducks = [], eggs = [];
   function bigScale() { return innerWidth <= 767 ? 2.5 : 3; }   // same size as the duck on the main site
   function floorY() { return H * 0.62; }
-  function newDuck(x) { return { x: x, tx: x, tag: "idle", until: 0, tagStart: 0, sq: 1, jy: 0, jv: 0, flip: false, taps: [], mode: "here", idleAt: performance.now(), egg: false }; }
+  /* five characters: what a tap does and how often they fly on their own */
+  var KINDS = ["flyer", "singer", "naughty", "sleepy", "jumpy"];
+  var FLY = { flyer: 0.75, singer: 0.15, naughty: 0.2, sleepy: 0.1, jumpy: 0.3 };
+  var usedHues = [];
+  function pickKind() { var have = ducks.map(function (o) { return o.kind; }), free = KINDS.filter(function (k) { return have.indexOf(k) < 0; }); free = free.length ? free : KINDS; return free[(Math.random() * free.length) | 0]; }
+  function pickHue() { var have = ducks.map(function (o) { return o.hue; }); if (!ducks.length) return 0; for (var i = 1; i < HUES.length; i++) if (have.indexOf(i) < 0) return i; return 1 + ((Math.random() * (HUES.length - 1)) | 0); }
+  function newDuck(x) { return { kind: pickKind(), hue: pickHue(), x: x, tx: x, tag: "idle", until: 0, tagStart: 0, sq: 1, jy: 0, jv: 0, flip: false, taps: [], mode: "here", idleAt: performance.now(), egg: false }; }
   ducks.push(newDuck(0.5));
   function layout() {   // spread ducks and eggs evenly across the floor
     var all = ducks.concat(eggs), n = all.length;
@@ -172,16 +204,76 @@
       ctx.fillStyle = "#3a3a3a"; ctx.fillRect(bx + s, r.y + r.h * 0.58 - s * 2, bw - s * 2, s);
     });
   }
+  /* little tunes: a list of [key, beats]; each note is a quack on that piano key */
+  var seqTimers = [];
+  function playSeq(notes, beat, onNote, done) {
+    var t = 0;
+    notes.forEach(function (n, i) { seqTimers.push(setTimeout(function () { if (n[0] >= 0) playKey(n[0], performance.now()); if (onNote) onNote(i); }, t)); t += n[1] * beat; });
+    if (done) seqTimers.push(setTimeout(done, t));
+  }
+  var TUNES = [[[0, .5], [2, .5], [4, 1]], [[4, .5], [4, .5], [5, .5], [4, 1]], [[7, .5], [6, .5], [4, .5], [2, 1]], [[0, .5], [4, .5], [7, 1]], [[4, .5], [2, .5], [3, .5], [1, .5], [0, 1]]];
+  function sing(d) {   // the singer: a short tune, bobbing along
+    if (d.singing) return; d.singing = true; var b = box(d); word(b.x, b.y - b.r * 1.3, "\u266B");
+    playSeq(TUNES[(Math.random() * TUNES.length) | 0], 300, function () { if (d.jy === 0 && !d.air) { d.jv = -4; } }, function () { d.singing = false; });
+  }
+  function prank(d, now) {   // the naughty one: sneaks up on another duck and bumps it, or stomps the piano
+    var others = ducks.filter(function (o) { return o !== d && o.mode === "here" && !o.air; });
+    if (others.length && Math.random() < 0.7) d.prank = { who: others[(Math.random() * others.length) | 0] };
+    else d.prank = { key: (Math.random() * NK) | 0 };
+    d.prank.until = now + 5000;
+  }
+  function stepPrank(d, now) {
+    var P = d.prank, tx = P.who ? P.who.x * W + (P.who.x * W > d.x * W ? -FR * bigScale() * 0.6 : FR * bigScale() * 0.6) : keyRect(P.key).x + keyRect(P.key).w / 2;
+    if (now > P.until || (P.who && (P.who.mode !== "here" || ducks.indexOf(P.who) < 0))) { d.prank = null; d.tx = d.x; return; }
+    var dx = tx - d.x * W;
+    if (Math.abs(dx) > 4) { d.x += Math.sign(dx) * Math.min(Math.abs(dx), 2.2) / W; d.flip = dx < 0; d.walking = true; return; }
+    var b = box(d);
+    if (P.who) { var o = P.who; if (o.jy === 0) o.jv = -9; o.sq = 0.6; setTag(o, "jump", 0, now); quack(1.9, 0.35); boing(); var ob = box(o); word(ob.x, ob.y - ob.r * 1.3, "!"); }
+    else { d.jv = -7; playKey(P.key, now); }
+    word(b.x, b.y - b.r * 1.3, "hehe"); d.prank = null; d.tx = d.x; d.flip = !d.flip;
+  }
+  function moodAct(d, now) {   // what each character does on its own now and then
+    if (d.kind === "singer" && Math.random() < 0.6) { sing(d); return true; }
+    if (d.kind === "naughty" && ducks.length > 1 && Math.random() < 0.6) { prank(d, now); return true; }
+    if (d.kind === "sleepy") { setTag(d, "sleepy", 3500, now); var b = box(d); word(b.x + b.r, b.y - b.r, "z z"); return true; }
+    if (d.kind === "jumpy" && d.jy === 0) { d.jv = -9; boing(); setTag(d, "jump", 0, now); return true; }
+    return false;
+  }
+
+  /* the "Five Little Ducks" button under the piano: the whole song sung in quacks (do=0 ... high do=7) */
+  var SONG = [
+    [4, .5], [2, .5], [2, .5], [2, 1], [3, .5], [2, .5], [1, 1], [1, 1.5], [-1, .5],         // Five little ducks went out one day
+    [2, .5], [0, .5], [0, .5], [0, 1], [1, .5], [2, .5], [1, 1], [1, 1.5], [-1, .5],         // Over the hills and far away
+    [4, .5], [4, .5], [2, .5], [2, .5], [4, .5], [4, .5], [4, .5], [4, 1.5], [-1, .5],       // Mother duck said quack quack quack quack
+    [2, .5], [2, .5], [1, .5], [1, .5], [2, .5], [1, .5], [0, .5], [1, .5], [0, 2]           // But only four little ducks came back
+  ];
+  var songOn = false;
+  function songRect() { var r0 = keyRect(0), w = 132, h = 48; return { x: W / 2 - w / 2, y: r0.y + r0.h + 22, w: w, h: h }; }
+  function stopSong() { seqTimers.forEach(clearTimeout); seqTimers = []; songOn = false; ducks.forEach(function (d) { d.singing = false; }); }
+  function toggleSong() {
+    if (songOn) { stopSong(); return; }
+    stopSong(); songOn = true;
+    playSeq(SONG, 420, function () { ducks.forEach(function (d) { if (d.mode === "here" && !d.air && d.jy === 0 && Math.random() < 0.5) d.jv = -3; }); }, function () { songOn = false; });
+  }
+  function drawSongButton(now) {
+    var r = songRect(), s = bigScale();
+    ctx.fillStyle = songOn ? "#2d8987" : "#1f1f1f"; ctx.fillRect(r.x, r.y, r.w, r.h);
+    ctx.fillStyle = "rgba(255,255,255,.12)"; ctx.fillRect(r.x, r.y, r.w, 2);
+    ctx.fillStyle = "#f4efe4"; var cx = r.x + 22, cy = r.y + r.h / 2;
+    if (songOn) { ctx.fillRect(cx - 7, cy - 8, 5, 16); ctx.fillRect(cx + 2, cy - 8, 5, 16); }                       // pause
+    else for (var i = 0; i < 8; i++) ctx.fillRect(cx - 6 + i * 2, cy - 8 + i, 2, 16 - i * 2);                      // play
+    for (var k = 0; k < 5; k++) drawSprite(0, r.x + 48 + k * 17, cy + (songOn ? Math.sin(now / 150 + k) * 2 : 0), 0.9, false, 0, k ? k : 0);   // five little ducks
+  }
+
   function pokeDuck(d, x, y, now) {
     d.idleAt = now; d.taps = d.taps.filter(function (t) { return now - t < 1800; }); d.taps.push(now);
     var b = box(d); d.sq = 0.7;
-    if (d.taps.length >= 6) {
-      d.taps = [];
-      if (ducks.filter(function (o) { return o.mode !== "bubble"; }).length > 1) { d.mode = "bubble"; d.air = null; d.bv = 0; quack(2, 0.4); bloop(); word(b.x, b.y - b.r * 1.4, "bye!"); return; }
-      setTag(d, "stunned", 1000, now); quack(0.9, 0.5); burst(x, y, 10); return;
-    }
-    if (!d.air && d.jy === 0) { d.jv = -6; boing(); }
-    setTag(d, d.air ? "fly" : "jump", 0, now);
+    if (d.air) setTag(d, "fly", 0, now);
+    else if (d.kind === "flyer") { setTag(d, "idle", 0, now); takeOff(d, now); }
+    else if (d.kind === "singer") { sing(d); return; }                              // sings a little tune
+    else if (d.kind === "naughty") { prank(d, now); }                               // goes off to bother someone
+    else if (d.kind === "sleepy") setTag(d, "sleepy", 1400, now);                   // yawns
+    else if (d.jy === 0) { d.jv = -11; boing(); setTag(d, "jump", 0, now); }        // jumpy: big hop
     keyLit[keyAt(d.x * W)] = 1; quack(noteOf(d) * 0.9, 0.4); burst(b.x, b.y - b.r, 3); word(b.x, b.y - b.r * 1.2, "\u266A");
   }
   function tapPeek(d, now) {   // tumble in from the sky; lays an egg on landing if there is room
@@ -210,16 +302,22 @@
   }
   function stepDuck(d, now) {
     var b, idx;
-    if (d.mode === "bubble") {
-      d.bv = Math.min(2.2, d.bv + 0.05); d.jy -= d.bv; d.x += Math.sin(now / 500) * 0.0015; b = box(d);
-      drawSprite(frameAt("idle", now), b.x, b.y, b.s, d.flip, Math.sin(now / 400) * 0.2);
-      drawBubble(b.x, b.y, b.r * 1.35, "#8fb8ff");
-      if (b.y < -b.r * 2) { ducks.splice(ducks.indexOf(d), 1); layout(); }
+    if (d.mode === "bubble") {   // floats away; gone for good once it leaves the top of the screen
+      d.jy -= 0.7; d.x += Math.sin(now / 600 + d.hue) * 0.0008; b = box(d);
+      drawSprite(frameAt("idle", now), b.x, b.y, b.s, d.flip, Math.sin(now / 400) * 0.2, d.hue);
+      drawBubble(b.x, b.y, b.r * 1.35, d.bcol || "#8fb8ff");
+      if (b.y < -b.r * 2) { ducks.splice(ducks.indexOf(d), 1); bloop(); layout(); if (!ducks.length) setTimeout(function () { var n = newDuck(0.5); n.mode = "falling"; n.jy = -H; ducks.push(n); }, 1200); }
+      return;
+    }
+    if (d.mode === "drag") {
+      b = box(d); drawSprite(frameAt("fly", now), b.x, b.y, b.s, d.flip, Math.sin(now / 150) * 0.12, d.hue);
+      if (now > (d.flapAt || 0)) { d.flapAt = now + 300; flap(); }
       return;
     }
     d.walking = false;
-    if (!d.air && d.mode !== "bubble") d.x += (d.tx - d.x) * 0.06;
-    if (d.mode === "here" && !d.air && now - d.idleAt > 2000 + Math.random() * 1500) { d.idleAt = now; var rr = Math.random(); if (rr < 0.7) takeOff(d, now); else if (rr < 0.88 && ducks.length + eggs.length < MAX) hide(d, now); }
+    if (d.prank && d.mode === "here" && !d.air) stepPrank(d, now);
+    else if (!d.air && d.mode !== "bubble") d.x += (d.tx - d.x) * 0.06;
+    if (d.mode === "here" && !d.air && now - d.idleAt > 2000 + Math.random() * 1500) { d.idleAt = now; var rr = Math.random(); if (rr < FLY[d.kind]) takeOff(d, now); else if (rr < FLY[d.kind] + 0.25 && moodAct(d, now)) {} else if (rr < FLY[d.kind] + 0.4 && ducks.length + eggs.length < MAX) hide(d, now); }
     if (d.air && d.mode === "here") {
       var A = d.air, landing = now > A.until, gy = landing ? 0 : A.ty + Math.sin(now / 400) * 10;
       if (now > (d.flapAt || 0)) { d.flapAt = now + 380; flap(); }
@@ -231,7 +329,7 @@
     if (d.mode === "peek") {
       var p = peekBox(d), up = Math.min(1, (now - d.peekAt) / 400), bob = Math.sin(now / 300) * p.s;
       ctx.save(); ctx.imageSmoothingEnabled = false; ctx.translate(p.x, 0); if (d.flip) ctx.scale(-1, 1);
-      if (PEEK.naturalWidth) ctx.drawImage(PEEK, -p.w / 2, H - p.h * up + bob + p.s * 2, p.w, p.h); ctx.restore();
+      if (PEEK.naturalWidth) ctx.drawImage((d.hue && PEEKS[d.hue]) || PEEK, -p.w / 2, H - p.h * up + bob + p.s * 2, p.w, p.h); ctx.restore();
       return;
     }
     if (d.mode === "falling") {
@@ -247,7 +345,7 @@
     idx = d.air ? frameAt("fly", now) : d.walking ? frameAt("walk", now) : d.mode === "falling" ? frameAt("fall", now) : d.tag === "stunned" ? TAGS.stunned.from + (((now - d.tagStart) / 200) | 0) % 5 : frameAt(d.tag, now);
     if (d.mode !== "hiding") { ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(b.x, floorY() + FR * b.s * 0.42, FR * b.s * 0.3, FR * b.s * 0.06, 0, 0, 7); ctx.fill(); }
     ctx.save(); ctx.translate(b.x, b.y + FR * b.s / 2); ctx.scale(2 - d.sq, d.sq); ctx.translate(-b.x, -(b.y + FR * b.s / 2));
-    drawSprite(idx, b.x, b.y, b.s, d.flip, d.mode === "falling" ? now / 120 : 0);
+    drawSprite(idx, b.x, b.y, b.s, d.flip, d.mode === "falling" ? now / 120 : 0, d.hue);
     ctx.restore();
   }
 
@@ -255,10 +353,10 @@
   var bubbles = [], nextBubble = 0;
   var BCOL = ["#8fb8ff", "#ff8fa3", "#9be37a", "#f6c945", "#56bebc"];
   function stepBubbles(now) {
-    if (now > nextBubble && bubbles.length < 2) { nextBubble = now + 6000 + Math.random() * 6000;
+    if (now > nextBubble && bubbles.length < 3) { nextBubble = now + 3000 + Math.random() * 3000;
       bubbles.push({ x: W * (0.1 + Math.random() * 0.8), y: H + 30, r: 20 + Math.random() * 14, c: BCOL[(Math.random() * BCOL.length) | 0], ph: Math.random() * 6 }); }
     for (var i = bubbles.length - 1; i >= 0; i--) {
-      var b = bubbles[i]; b.y -= 0.6; var x = b.x + Math.sin(now / 600 + b.ph) * 20;
+      var b = bubbles[i]; b.y -= 0.5; var x = b.x + Math.sin(now / 600 + b.ph) * 20;
       if (b.y < -40) { bubbles.splice(i, 1); continue; }
       b.cx = x; drawBubble(x, b.y, b.r, b.c);
     }
@@ -318,14 +416,33 @@
     var i, d;
     for (i = ducks.length - 1; i >= 0; i--) { d = ducks[i];
       if (d.mode === "peek") { var p = peekBox(d); if (Math.abs(x - p.x) < p.w && y > H - p.h * 1.6) { emptyTaps = []; tapPeek(d, now); return; } }
-      else if (d.mode === "here") { var b = box(d); if (Math.hypot(x - b.x, y - b.y) < b.r) { emptyTaps = []; pokeDuck(d, x, y, now); return; } } }
+      else if (d.mode === "here") { var b = box(d); if (Math.hypot(x - b.x, y - b.y) < b.r) { emptyTaps = []; grab = { d: d, x: x, y: y, id: e.pointerId }; try { cv.setPointerCapture(e.pointerId); } catch (er) {} pokeDuck(d, x, y, now); return; } }
+      else if (d.mode === "bubble") { var bb = box(d); if (Math.hypot(x - bb.x, y - bb.y) < bb.r * 1.4) { d.mode = "falling"; d.egg = false; d.jv = 0; burst(bb.x, bb.y, 5); blip(1200, 400, 0.15); emptyTaps = []; return; } } }
     for (i = 0; i < eggs.length; i++) { var eb = eggBox(eggs[i]); if (Math.hypot(x - eb.x, y - eb.y) < eb.ry * 1.6) { emptyTaps = []; tapEgg(eggs[i], now); return; } }
     for (i = 0; i < bubbles.length; i++) { var bu = bubbles[i]; if (Math.hypot(x - (bu.cx || bu.x), y - bu.y) < bu.r + 18) { popBubble(i, now); emptyTaps = []; return; } }
+    var sr = songRect(); if (x >= sr.x && x <= sr.x + sr.w && y >= sr.y && y <= sr.y + sr.h) { emptyTaps = []; toggleSong(); return; }
     for (i = 0; i < NK; i++) { var kr = keyRect(i); if (x >= kr.x - 3 && x <= kr.x + kr.w + 3 && y >= kr.y - 6 && y <= kr.y + kr.h + 6) { emptyTaps = []; playKey(i, now); return; } }
     burst(x, y, 3); blip(500 + Math.random() * 400, 300, 0.12);
     emptyTaps = emptyTaps.filter(function (t) { return now - t < 900; }); emptyTaps.push(now);
     if (emptyTaps.length >= 3) { emptyTaps = []; startParade(now); }
   });
+  /* drag a duck: hold and move it; let go over a bubble and it rides that bubble away */
+  var grab = null;
+  cv.addEventListener("pointermove", function (e) {
+    if (!grab || e.pointerId !== grab.id) return;
+    var d = grab.d;
+    if (d.mode !== "drag") { if (Math.hypot(e.clientX - grab.x, e.clientY - grab.y) < 14 || d.mode !== "here") return; d.mode = "drag"; d.air = null; d.jv = 0; whoosh(); }
+    d.flip = e.clientX < d.x * W; d.x = e.clientX / W; d.jy = e.clientY - floorY();
+  });
+  function release(e) {
+    if (!grab || e.pointerId !== grab.id) return;
+    var d = grab.d; grab = null; if (d.mode !== "drag") return;
+    var b = box(d);
+    for (var i = 0; i < bubbles.length; i++) { var bu = bubbles[i];
+      if (Math.hypot(b.x - bu.cx, b.y - bu.y) < bu.r + b.r) { bubbles.splice(i, 1); d.mode = "bubble"; d.bcol = bu.c; d.x = bu.cx / W; d.jy = bu.y - floorY(); quack(1.8, 0.35); bloop(); word(bu.cx, bu.y - b.r * 1.6, "bye!"); return; } }
+    d.mode = "falling"; d.egg = false; d.jv = 0; d.tx = d.x;   // dropped somewhere else: just tumbles down
+  }
+  cv.addEventListener("pointerup", release); cv.addEventListener("pointercancel", release);
   document.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
   document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
 
@@ -343,6 +460,7 @@
 
   /* ---------- loop ---------- */
   function frame(now) {
+    buildTints();
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = "#101010"; ctx.fillRect(0, 0, W, H);
     bg.forEach(function (p) {
@@ -352,7 +470,7 @@
     });
     ctx.globalAlpha = 1;
 
-    drawKeys();
+    drawKeys(); drawSongButton(now);
     eggs.forEach(function (e) { e.x += (e.tx - e.x) * 0.06; drawEgg(e, now); });
     ducks.forEach(function (d) { stepDuck(d, now); });
     stepBubbles(now);
