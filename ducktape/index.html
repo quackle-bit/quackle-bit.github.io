@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#14222b">
+<title>Duck Tape</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #14222b; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(function () {
+  "use strict";
+  var ART = "/wp-content/uploads/qb-duck/", FR = 26;
+  var TAGS = {
+    idle: { from: 0, d: [400, 300, 400, 300] }, walk: { from: 8, d: [100, 100] }, jump: { from: 10, d: [100] },
+    fly: { from: 11, d: [100, 100] }, eat: { from: 13, d: [100, 100] }, gulp: { from: 15, d: [200] }, burp: { from: 16, d: [300] },
+    stunned: { from: 17, d: [200, 200, 200, 200, 200] }, land: { from: 22, d: [100] }, fall: { from: 23, d: [100, 100] }
+  };
+  function frameAt(tag, t) {
+    var T = TAGS[tag], total = 0, i; for (i = 0; i < T.d.length; i++) total += T.d[i];
+    var m = t % total; for (i = 0; i < T.d.length; i++) { if (m < T.d[i]) return T.from + i; m -= T.d[i]; }
+    return T.from;
+  }
+  var SHEET = new Image(); SHEET.src = ART + "duck.png";
+  var cv = document.getElementById("c"), ctx = cv.getContext("2d"), W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.imageSmoothingEnabled = false;
+  }
+  addEventListener("resize", resize); resize();
+  function drawSprite(idx, x, y, s, flip, rot) {   // x,y = center of the frame
+    if (!SHEET.naturalWidth) return;
+    ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); if (flip) ctx.scale(-1, 1);
+    ctx.drawImage(SHEET, idx * FR, 0, FR, FR, -FR * s / 2, -FR * s / 2, FR * s, FR * s); ctx.restore();
+  }
+
+  /* ---------- sound ---------- */
+  var audio = null, quackBuf = null;
+  function actx() {
+    if (!audio) {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+      audio = new AC();
+      fetch(ART + "quack.mp3").then(function (r) { return r.arrayBuffer(); })
+        .then(function (b) { return new Promise(function (ok, no) { audio.decodeAudioData(b, ok, no); }); })
+        .then(function (buf) { quackBuf = buf; }).catch(function () {});
+    }
+    if (audio.state !== "running") audio.resume();
+    return audio;
+  }
+  function quack(rate, vol) {
+    var c = actx(); if (!c || !quackBuf) return;
+    var s = c.createBufferSource(), g = c.createGain();
+    s.buffer = quackBuf; s.playbackRate.value = rate || (1.2 + Math.random() * 0.45);
+    g.gain.value = vol == null ? 0.45 : vol; s.connect(g); g.connect(c.destination); s.start();
+  }
+  function blip(f1, f2, dur) {
+    var c = actx(); if (!c) return;
+    var o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+    o.type = "triangle"; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur);
+  }
+
+  /* ---------- background particles ---------- */
+  var COLORS = ["#56bebc", "#f6c945", "#ff8fa3", "#9be37a", "#8fb8ff", "#ffffff"];
+  var bg = [];
+  for (var i = 0; i < 70; i++) bg.push({ x: Math.random(), y: Math.random(), r: 1 + Math.random() * 3.5, v: 0.008 + Math.random() * 0.025, ph: Math.random() * 6.3, c: COLORS[i % COLORS.length], a: 0.15 + Math.random() * 0.35 });
+  var fx = [];   // bursts: confetti squares, hearts, "QUACK!" text
+  function burst(x, y, n) {
+    for (var i = 0; i < n; i++) {
+      var a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 6;
+      fx.push({ k: "p", x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 3, s: 4 + Math.random() * 6, c: COLORS[(Math.random() * COLORS.length) | 0], life: 1, rot: Math.random() * 6 });
+    }
+  }
+  var WORDS = ["QUACK!", "quack!", "Quack!", "QUAAACK!", "quack quack!"];
+  function word(x, y, t) { fx.push({ k: "t", x: x, y: y, vx: (Math.random() - 0.5) * 1.5, vy: -2.2, t: t || WORDS[(Math.random() * WORDS.length) | 0], c: COLORS[(Math.random() * 5) | 0], life: 1 }); }
+
+  /* ---------- ducks (start with 1, max 5 incl. eggs) ---------- */
+  var PEEK = new Image(); PEEK.src = ART + "peek.png";
+  var MAX = 5, ducks = [], eggs = [];
+  function bigScale() { var n = ducks.length + eggs.length; return Math.max(4, Math.floor(Math.min(W, H) * (n <= 1 ? 0.5 : n <= 2 ? 0.36 : 0.27) / FR)); }
+  function floorY() { return H * 0.62; }
+  function newDuck(x) { return { x: x, tx: x, tag: "idle", until: 0, tagStart: 0, sq: 1, jy: 0, jv: 0, flip: false, taps: [], mode: "here", idleAt: performance.now(), egg: false }; }
+  ducks.push(newDuck(0.5));
+  function layout() {   // spread ducks and eggs evenly across the floor
+    var all = ducks.concat(eggs), n = all.length;
+    all.forEach(function (o, i) { o.tx = (i + 1) / (n + 1); });
+  }
+  function setTag(d, tag, ms, now) { d.tag = tag; d.until = ms ? now + ms : 0; d.tagStart = now; }
+  function box(d) { var s = bigScale(); return { x: d.x * W, y: floorY() + d.jy, s: s, r: FR * s * 0.42 }; }
+  function peekBox(d) { var s = bigScale() * 0.8; return { x: d.x * W, y: H - 16 * s * 0.5, w: 16 * s, h: 20 * s, s: s }; }
+  function hide(d, now) { d.mode = "hiding"; d.flip = Math.random() < 0.5; quack(1.8, 0.3); blip(700, 200, 0.3); }
+  function pokeDuck(d, x, y, now) {
+    d.idleAt = now; d.taps = d.taps.filter(function (t) { return now - t < 1500; }); d.taps.push(now);
+    var b = box(d); d.flip = x < b.x; d.sq = 0.75;
+    if (d.taps.length >= 6) { setTag(d, "stunned", 1000, now); d.taps = []; quack(0.9, 0.5); blip(600, 150, 0.4); word(b.x, b.y - b.r, "@#!?"); burst(x, y, 30); return; }
+    if (d.taps.length >= 3 && Math.random() < 0.3) { hide(d, now); burst(x, y, 12); word(b.x, b.y - b.r, "eep!"); return; }
+    var r = Math.random();
+    if (r < 0.45) { if (d.jy === 0) d.jv = -14 - Math.random() * 6; setTag(d, "jump", 0, now); }
+    else if (r < 0.65) setTag(d, "fly", 700, now);
+    else if (r < 0.8) setTag(d, "eat", 600, now);
+    else if (r < 0.92) setTag(d, "burp", 500, now);
+    else setTag(d, "gulp", 400, now);
+    quack(); burst(x, y, 18); word(b.x + (Math.random() - 0.5) * b.r, b.y - b.r * 1.1);
+  }
+  function tapPeek(d, now) {   // tumble in from the sky; lays an egg on landing if there is room
+    d.mode = "falling"; d.jy = -floorY() - FR * bigScale(); d.jv = 0; d.egg = ducks.length + eggs.length < MAX;
+    quack(1.3, 0.5); blip(900, 300, 0.4);
+  }
+  function tapEgg(e, now) {
+    e.hits++; e.shake = 1; blip(300 + e.hits * 120, 200, 0.1); var b = eggBox(e); burst(b.x, b.y, 8);
+    if (e.hits >= e.need) {
+      eggs.splice(eggs.indexOf(e), 1); var d = newDuck(e.x); d.tx = e.tx; d.sq = 0.5; d.jv = -12; setTag(d, "jump", 0, now); ducks.push(d); layout();
+      burst(b.x, b.y, 40); word(b.x, b.y - 40, "peep!"); quack(1.9, 0.5);
+    }
+  }
+  function eggBox(e) { var s = bigScale() * 0.9; return { x: e.x * W, y: floorY() + FR * bigScale() * 0.42 - 7 * s, s: s, rx: 5 * s, ry: 7 * s }; }
+  function drawEgg(e, now) {
+    var b = eggBox(e); e.shake *= 0.85; var rot = Math.sin(now / 30) * 0.3 * e.shake;
+    ctx.save(); ctx.translate(b.x, b.y + b.ry); ctx.rotate(rot); ctx.translate(0, -b.ry);
+    ctx.fillStyle = "#fff8e6"; ctx.strokeStyle = "#111b22"; ctx.lineWidth = Math.max(3, b.s);
+    ctx.beginPath(); ctx.ellipse(0, 0, b.rx, b.ry, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#f6c945"; ctx.fillRect(-b.rx * 0.5, -b.ry * 0.3, b.s * 1.5, b.s * 1.5); ctx.fillRect(b.rx * 0.2, b.ry * 0.2, b.s * 1.2, b.s * 1.2);
+    if (e.hits) { ctx.strokeStyle = "#5a4a2a"; ctx.lineWidth = Math.max(2, b.s * 0.6); ctx.beginPath(); ctx.moveTo(-b.rx * 0.8, -b.ry * 0.1);
+      for (var k = 0; k < e.hits * 2; k++) ctx.lineTo(-b.rx * 0.8 + (k + 1) * b.rx * 0.4, -b.ry * 0.1 + (k % 2 ? -1 : 1) * b.s * 1.5); ctx.stroke(); }
+    ctx.restore();
+  }
+  function stepDuck(d, now) {
+    var b, idx;
+    d.x += (d.tx - d.x) * 0.06;
+    if (d.mode === "here" && now - d.idleAt > 12000 + Math.random() * 8000) { d.idleAt = now; if (Math.random() < 0.5) hide(d, now); }
+    if (d.mode === "hiding") { d.jy += 18; if (d.jy > H) { d.mode = "peek"; d.peekAt = now; } }
+    if (d.mode === "peek") {
+      var p = peekBox(d), up = Math.min(1, (now - d.peekAt) / 400), bob = Math.sin(now / 300) * p.s;
+      ctx.save(); ctx.imageSmoothingEnabled = false; ctx.translate(p.x, 0); if (d.flip) ctx.scale(-1, 1);
+      if (PEEK.naturalWidth) ctx.drawImage(PEEK, -p.w / 2, H - p.h * up + bob + p.s * 2, p.w, p.h); ctx.restore();
+      return;
+    }
+    if (d.mode === "falling") {
+      d.jv += 1.2; d.jy += d.jv;
+      if (d.jy >= 0) {
+        d.jy = 0; d.jv = 0; d.mode = "here"; d.sq = 0.6; setTag(d, "stunned", 1000, now); b = box(d); burst(b.x, b.y + b.r, 25); blip(200, 60, 0.3);
+        if (d.egg && ducks.length + eggs.length < MAX) { d.egg = false; eggs.push({ x: d.x, tx: d.x, hits: 0, need: 3 + ((Math.random() * 2) | 0), shake: 1 }); layout(); word(b.x, b.y - b.r * 1.2, "plop!"); }
+      }
+    } else if (d.jv || d.jy) { d.jv += 1.1; d.jy += d.jv; if (d.jy >= 0) { d.jy = 0; d.jv = 0; d.sq = 0.8; if (d.tag === "jump") setTag(d, "land", 150, now); } }
+    if (d.until && now > d.until) setTag(d, "idle", 0, now);
+    d.sq += (1 - d.sq) * 0.2;
+    b = box(d);
+    idx = d.mode === "falling" ? frameAt("fall", now) : d.tag === "stunned" ? TAGS.stunned.from + (((now - d.tagStart) / 200) | 0) % 5 : frameAt(d.tag, now);
+    if (d.mode !== "hiding") { ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(b.x, floorY() + FR * b.s * 0.42, FR * b.s * 0.3, FR * b.s * 0.06, 0, 0, 7); ctx.fill(); }
+    ctx.save(); ctx.translate(b.x, b.y + FR * b.s / 2); ctx.scale(2 - d.sq, d.sq); ctx.translate(-b.x, -(b.y + FR * b.s / 2));
+    drawSprite(idx, b.x, b.y, b.s, d.flip, d.mode === "falling" ? now / 120 : 0); ctx.restore();
+  }
+
+  /* ---------- parade (3 taps on empty space) ---------- */
+  var parade = [], emptyTaps = [];
+  function startParade(now) {
+    var kinds = ["walk", "fly", "drop"], n = 14, dir = Math.random() < 0.5 ? 1 : -1;
+    for (var i = 0; i < n; i++) {
+      var k = kinds[(Math.random() * 3) | 0], s = Math.max(3, Math.round(bigScale() * (0.3 + Math.random() * 0.25)));
+      var p = { k: k, s: s, dir: dir, delay: now + i * 220 + Math.random() * 150, sp: (k === "fly" ? 4 : 2.6) + Math.random() * 1.5, quacked: false };
+      p.x = dir > 0 ? -FR * s : W + FR * s;
+      p.y = k === "walk" ? H - FR * s * 0.5 - 8 : k === "fly" ? H * (0.1 + Math.random() * 0.35) : -FR * s;
+      if (k === "drop") { p.x = W * (0.1 + Math.random() * 0.8); p.vy = 0; p.land = H - FR * s * 0.5 - 8; p.state = "fall"; }
+      parade.push(p);
+    }
+    blip(400, 900, 0.25);
+  }
+  function stepParade(now) {
+    for (var i = parade.length - 1; i >= 0; i--) {
+      var p = parade[i]; if (now < p.delay) continue;
+      if (!p.quacked && Math.random() < 0.02) { p.quacked = true; quack(1.5 + Math.random() * 0.4, 0.25); }
+      var tag;
+      if (p.k === "drop") {
+        if (p.state === "fall") { p.vy += 0.5; p.y += p.vy; tag = "fall"; if (p.y >= p.land) { p.y = p.land; p.state = "stun"; p.st = now; burst(p.x, p.y + FR * p.s * 0.3, 8); } }
+        else if (p.state === "stun") { tag = "stunned"; if (now - p.st > 900) p.state = "walk"; }
+        else { p.x += p.sp * p.dir; tag = "walk"; }
+      } else { p.x += p.sp * p.dir; tag = p.k; if (p.k === "fly") p.y += Math.sin(now / 200 + i) * 0.6; }
+      var idx = p.state === "stun" ? TAGS.stunned.from + (((now - p.st) / 200) | 0) % 5 : frameAt(tag, now + i * 37);
+      drawSprite(idx, p.x, p.y, p.s, p.dir < 0, 0);
+      if (p.x < -FR * p.s * 2 || p.x > W + FR * p.s * 2) parade.splice(i, 1);
+    }
+  }
+
+  /* ---------- input ---------- */
+  cv.addEventListener("pointerdown", function (e) {
+    e.preventDefault(); actx();
+    var now = performance.now(), x = e.clientX, y = e.clientY;
+    var i, d;
+    for (i = ducks.length - 1; i >= 0; i--) { d = ducks[i];
+      if (d.mode === "peek") { var p = peekBox(d); if (Math.abs(x - p.x) < p.w && y > H - p.h * 1.6) { emptyTaps = []; tapPeek(d, now); return; } }
+      else if (d.mode === "here") { var b = box(d); if (Math.hypot(x - b.x, y - b.y) < b.r) { emptyTaps = []; pokeDuck(d, x, y, now); return; } } }
+    for (i = 0; i < eggs.length; i++) { var eb = eggBox(eggs[i]); if (Math.hypot(x - eb.x, y - eb.y) < eb.ry * 1.6) { emptyTaps = []; tapEgg(eggs[i], now); return; } }
+    burst(x, y, 6); blip(500 + Math.random() * 400, 300, 0.12);
+    emptyTaps = emptyTaps.filter(function (t) { return now - t < 900; }); emptyTaps.push(now);
+    if (emptyTaps.length >= 3) { emptyTaps = []; startParade(now); }
+  });
+  document.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
+
+  /* ---------- loop ---------- */
+  function frame(now) {
+    ctx.clearRect(0, 0, W, H);
+    var g = ctx.createRadialGradient(W / 2, H * 0.55, 0, W / 2, H * 0.55, Math.max(W, H) * 0.7);
+    g.addColorStop(0, "#21414d"); g.addColorStop(1, "#111b22"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    bg.forEach(function (p) {
+      p.y -= p.v / 60; if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); }
+      ctx.globalAlpha = p.a * (0.6 + 0.4 * Math.sin(now / 700 + p.ph)); ctx.fillStyle = p.c;
+      ctx.beginPath(); ctx.arc(p.x * W + Math.sin(now / 1500 + p.ph) * 12, p.y * H, p.r, 0, 7); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+
+    eggs.forEach(function (e) { e.x += (e.tx - e.x) * 0.06; drawEgg(e, now); });
+    ducks.forEach(function (d) { stepDuck(d, now); });
+    stepParade(now);
+
+    for (var i = fx.length - 1; i >= 0; i--) {
+      var f = fx[i]; f.x += f.vx; f.y += f.vy; f.life -= f.k === "t" ? 0.012 : 0.02;
+      if (f.k === "p") { f.vy += 0.25; f.rot += 0.2; }
+      if (f.life <= 0) { fx.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.min(1, f.life * 1.5); ctx.fillStyle = f.c;
+      if (f.k === "p") { ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.rot); ctx.fillRect(-f.s / 2, -f.s / 2, f.s, f.s); ctx.restore(); }
+      else { ctx.font = "bold " + Math.round(Math.max(28, bigScale() * 6)) + "px system-ui, -apple-system, sans-serif"; ctx.textAlign = "center"; ctx.lineWidth = 6; ctx.strokeStyle = "#111b22"; ctx.strokeText(f.t, f.x, f.y); ctx.fillText(f.t, f.x, f.y); }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
