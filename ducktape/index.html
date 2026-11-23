@@ -17,7 +17,7 @@
 <script>
 (function () {
   "use strict";
-  var ART = "/wp-content/uploads/qb-duck/", FR = 26;
+  var ART = (!/^https?:/.test(location.protocol) ? "https://quacklebit.com" : "") + "/wp-content/uploads/qb-duck/", FR = 26;
   var TAGS = {
     idle: { from: 0, d: [400, 300, 400, 300] }, walk: { from: 8, d: [100, 100] }, jump: { from: 10, d: [100] },
     fly: { from: 11, d: [100, 100] }, eat: { from: 13, d: [100, 100] }, gulp: { from: 15, d: [200] }, burp: { from: 16, d: [300] },
@@ -149,7 +149,7 @@
         d.jy = 0; d.jv = 0; d.mode = "here"; d.sq = 0.6; setTag(d, "stunned", 1000, now); b = box(d); burst(b.x, b.y + b.r, 25); blip(200, 60, 0.3);
         if (d.egg && ducks.length + eggs.length < MAX) { d.egg = false; eggs.push({ x: d.x, tx: d.x, hits: 0, need: 3 + ((Math.random() * 2) | 0), shake: 1 }); layout(); word(b.x, b.y - b.r * 1.2, "plop!"); }
       }
-    } else if (d.jv || d.jy) { d.jv += 1.1; d.jy += d.jv; if (d.jy >= 0) { d.jy = 0; d.jv = 0; d.sq = 0.8; if (d.tag === "jump") setTag(d, "land", 150, now); } }
+    } else if (d.mode === "here" && (d.jv || d.jy)) { d.jv += 1.1; d.jy += d.jv; if (d.jy >= 0) { d.jy = 0; d.jv = 0; d.sq = 0.8; if (d.tag === "jump") setTag(d, "land", 150, now); } }
     if (d.until && now > d.until) setTag(d, "idle", 0, now);
     d.sq += (1 - d.sq) * 0.2;
     b = box(d);
