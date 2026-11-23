@@ -103,7 +103,25 @@
   function peekBox(d) { var s = bigScale() * 0.8; return { x: d.x * W, y: H - 16 * s * 0.5, w: 16 * s, h: 20 * s, s: s }; }
   function hide(d, now) { d.mode = "hiding"; d.flip = Math.random() < 0.5; quack(1.8, 0.3); blip(700, 200, 0.3); }
   var NOTES = [1.0, 1.12, 1.26, 1.5, 1.68];   // do re mi sol la, left to right
-  function noteOf(d) { var order = ducks.filter(function (o) { return o.mode !== "bubble"; }).sort(function (p, q) { return p.tx - q.tx; }); return NOTES[Math.max(0, order.indexOf(d)) % NOTES.length]; }
+  var KEYCOL = ["#ff8fa3", "#f6c945", "#9be37a", "#56bebc", "#8fb8ff"], keyLit = [0, 0, 0, 0, 0];
+  function keyRect(k) { var s = bigScale(), kw = Math.min(W * 0.9, 560) / 5, x0 = W / 2 - kw * 2.5, y = floorY() + FR * s * 0.5 + 6;
+    return { x: x0 + k * kw + 3, y: y, w: kw - 6, h: Math.max(28, 12 * s) }; }
+  function keyAt(px_) { var r0 = keyRect(0), kw = r0.w + 6; return Math.max(0, Math.min(4, Math.floor((px_ - (r0.x - 3)) / kw))); }
+  function noteOf(d) { return NOTES[keyAt(d.x * W)]; }
+  function playKey(k, now) {
+    keyLit[k] = 1; quack(NOTES[k] * 1.2, 0.45);
+    ducks.forEach(function (d) { if (d.mode === "here" && !d.air && keyAt(d.x * W) === k && d.jy === 0) { d.jv = -6; d.sq = 0.7; setTag(d, "jump", 0, now); } });
+  }
+  function drawKeys() {
+    var s = bigScale();
+    for (var k = 0; k < 5; k++) {
+      var r = keyRect(k), lit = keyLit[k]; keyLit[k] *= 0.9; var press = lit * s;
+      ctx.fillStyle = "#000"; ctx.fillRect(r.x, r.y + s, r.w, r.h);                    // pixel shadow
+      ctx.globalAlpha = 0.45 + lit * 0.55; ctx.fillStyle = KEYCOL[k]; ctx.fillRect(r.x, r.y + press, r.w, r.h - s);
+      ctx.globalAlpha = 0.25; ctx.fillStyle = "#fff"; ctx.fillRect(r.x + s, r.y + press + s, r.w - 2 * s, s);   // top shine
+      ctx.globalAlpha = 1;
+    }
+  }
   function pokeDuck(d, x, y, now) {
     d.idleAt = now; d.taps = d.taps.filter(function (t) { return now - t < 1800; }); d.taps.push(now);
     var b = box(d); d.sq = 0.7;
@@ -114,7 +132,7 @@
     }
     if (!d.air && d.jy === 0) d.jv = -6;
     setTag(d, d.air ? "fly" : "jump", 0, now);
-    quack(noteOf(d) * 1.2, 0.45); burst(b.x, b.y - b.r, 3); word(b.x, b.y - b.r * 1.2, "\u266A");
+    keyLit[keyAt(d.x * W)] = 1; quack(noteOf(d) * 1.2, 0.45); burst(b.x, b.y - b.r, 3); word(b.x, b.y - b.r * 1.2, "\u266A");
   }
   function tapPeek(d, now) {   // tumble in from the sky; lays an egg on landing if there is room
     d.mode = "falling"; d.jy = -floorY() - FR * bigScale(); d.jv = 0; d.egg = ducks.length + eggs.length < MAX;
@@ -252,6 +270,7 @@
       else if (d.mode === "here") { var b = box(d); if (Math.hypot(x - b.x, y - b.y) < b.r) { emptyTaps = []; pokeDuck(d, x, y, now); return; } } }
     for (i = 0; i < eggs.length; i++) { var eb = eggBox(eggs[i]); if (Math.hypot(x - eb.x, y - eb.y) < eb.ry * 1.6) { emptyTaps = []; tapEgg(eggs[i], now); return; } }
     for (i = 0; i < bubbles.length; i++) { var bu = bubbles[i]; if (Math.hypot(x - (bu.cx || bu.x), y - bu.y) < bu.r + 18) { popBubble(i, now); emptyTaps = []; return; } }
+    for (i = 0; i < 5; i++) { var kr = keyRect(i); if (x >= kr.x - 3 && x <= kr.x + kr.w + 3 && y >= kr.y - 6 && y <= kr.y + kr.h + 6) { emptyTaps = []; playKey(i, now); return; } }
     burst(x, y, 3); blip(500 + Math.random() * 400, 300, 0.12);
     emptyTaps = emptyTaps.filter(function (t) { return now - t < 900; }); emptyTaps.push(now);
     if (emptyTaps.length >= 3) { emptyTaps = []; startParade(now); }
@@ -270,6 +289,7 @@
     });
     ctx.globalAlpha = 1;
 
+    drawKeys();
     eggs.forEach(function (e) { e.x += (e.tx - e.x) * 0.06; drawEgg(e, now); });
     ducks.forEach(function (d) { stepDuck(d, now); });
     stepBubbles(now);
