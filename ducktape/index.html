@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Duck Tape">
+<link rel="apple-touch-icon" href="/ducktape/icon.png">
+<link rel="icon" href="/ducktape/icon.png">
 <meta name="theme-color" content="#101010">
 <title>Duck Tape</title>
 <style>
@@ -14,11 +19,17 @@
   #fs svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
   #fs:active svg { transform: translateY(3px); }
   #fs:active .lip { display: none; }
+  #tip { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(320px, calc(100vw - 32px)); z-index: 3;
+    background: #f6c945; color: #0a0a0a; font: 600 15px/1.45 -apple-system, system-ui, sans-serif; text-align: center; padding: 14px 16px 16px;
+    box-shadow: 0 -4px 0 #0a0a0a, 0 4px 0 #0a0a0a, -4px 0 0 #0a0a0a, 4px 0 0 #0a0a0a, 0 10px 0 #0a0a0a; image-rendering: pixelated; }
+  #tip[hidden] { display: none; }
+  #tip b { display: inline-block; background: #0a0a0a; color: #f6c945; padding: 0 6px; }
   #fs[hidden] { display: none; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="tip" hidden>Full screen on iPhone:<br>tap <b>Share &#x2191;</b> then <b>Add to Home Screen</b>,<br>and open Duck Tape from there.</div>
 <button id="fs" aria-label="Full screen" hidden><svg viewBox="0 0 18 18">
   <path fill="#0a0a0a" d="M2 0h14v1h1v1h1v14h-1v1h-1v1H2v-1H1v-1H0V2h1V1h1z"/>
   <path class="lip" fill="#1a1a1a" d="M1 14h16v2h-1v1H2v-1H1z"/>
@@ -490,6 +501,8 @@
   /* ---------- full screen button (hidden where the browser can't do it, e.g. iPhone Safari) ---------- */
   var fsBtn = document.getElementById("fs"), root = document.documentElement;
   var reqFS = root.requestFullscreen || root.webkitRequestFullscreen;
+  var standalone = navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+  var tip = document.getElementById("tip"), tipTimer = 0;
   if (reqFS) {
     fsBtn.hidden = false;
     fsBtn.addEventListener("click", function () {
@@ -497,7 +510,15 @@
       if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
       else { var r = reqFS.call(root); if (r && r.catch) r.catch(function () {}); }
     });
+  } else if (!standalone) {   // iPhone: Safari can't go full screen, but a Home Screen web app opens without the address bar
+    fsBtn.hidden = false;
+    fsBtn.addEventListener("click", function () {
+      actx(); tip.hidden = !tip.hidden; clearTimeout(tipTimer);
+      if (!tip.hidden) tipTimer = setTimeout(function () { tip.hidden = true; }, 7000);
+    });
+    tip.addEventListener("click", function () { tip.hidden = true; });
   }
+
 
   /* ---------- loop ---------- */
   function frame(now) {
